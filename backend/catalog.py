@@ -4,23 +4,81 @@ function call, and every millisecond here is a gap in the assistant's voice.
 import re
 
 
+_MIN_STEM = 5
+
+
+def _words(text: str) -> list:
+    return re.findall(r"[a-z0-9]+", text)
+
+
 def _token_matches(token: str, hay: str) -> bool:
     """Match a search token against a product's text.
 
     Plain substring matching was quietly catastrophic: "ice" is inside "office",
     "service" and "price", so searching for an ice machine returned tissue dispensers
-    and hand soap — and not the ice machine. ASCII tokens therefore have to start at a
-    word boundary. Thai is written without spaces, so Thai tokens keep substring
-    matching; there is no word boundary to anchor to.
+    and hand soap — and not the ice machine. ASCII tokens must therefore align to a
+    whole word. They also need to survive English word endings — a customer asking about
+    "degreasing" has to reach the "degreaser" — so words match on a shared stem, with a
+    length floor so short words don't collide. Thai is written without spaces, so Thai
+    tokens keep substring matching; there is no word boundary to anchor to.
     """
-    if token.isascii():
-        return re.search(r"\b" + re.escape(token), hay) is not None
-    return token in hay
+    if not token.isascii():
+        return token in hay
+    for w in _words(hay):
+        if w == token:
+            return True
+        # Prefix matching only when the shorter word is substantial. Without the floor,
+        # "Ecolab" matched the word "eco" in "Eco Cup and Lid Range" and the brand search
+        # returned products from another brand entirely.
+        short, long_ = (w, token) if len(w) < len(token) else (token, w)
+        if len(short) >= _MIN_STEM and long_.startswith(short):
+            return True
+        if len(w) >= _MIN_STEM and len(token) >= _MIN_STEM and w[:_MIN_STEM] == token[:_MIN_STEM]:
+            return True
+    return False
+
+
+# What a match is worth, by where it lands. A product whose NAME says "degreaser" is a
+# better answer than one that merely mentions cleaning somewhere in its benefits. Without
+# this weighting every product in the segment scored the same and catalogue file order
+# decided the ranking — invisible at 18 products, badly wrong at 55.
+_STRONG, _MID, _WEAK = 3, 2, 1
+
+
+def _fields(p: dict):
+    strong = " ".join([p.get("name", ""), p.get("name_th", ""),
+                       p.get("category", "").replace("_", " ")] + p.get("brands", [])).lower()
+    mid = " ".join(p.get("use_cases", [])).lower()
+    weak = " ".join(p.get("benefits", []) + p.get("customer_types", [])).lower()
+    return strong, mid, weak
+
+
+def _match_rank(token: str, hay: str) -> int:
+    """2 for an exact word, 1 for a stem or prefix match, 0 for none.
+
+    An exact hit has to outrank a fuzzy one or ties fall back to catalogue file order:
+    searching "glassware" put "Glass and Mirror Cleaner" above the glassware range,
+    because both merely counted as a hit in the name.
+    """
+    if not token.isascii():
+        return 2 if token in hay else 0
+    if token in _words(hay):
+        return 2
+    return 1 if _token_matches(token, hay) else 0
+
+
+def _token_score(token: str, p: dict) -> int:
+    for hay, weight in zip(_fields(p), (_STRONG, _MID, _WEAK)):
+        rank = _match_rank(token, hay)
+        if rank:
+            return weight * rank
+    return 0
 
 
 def _haystack(p: dict) -> str:
     parts = [p.get("name", ""), p.get("name_th", ""), p.get("category", "")]
-    parts += p.get("use_cases", []) + p.get("benefits", []) + p.get("customer_types", [])
+    parts += (p.get("use_cases", []) + p.get("benefits", [])
+              + p.get("customer_types", []) + p.get("brands", []))
     return " ".join(parts).lower()
 
 
@@ -36,13 +94,12 @@ def search(products: list, query: str = "", category: str = "", customer_type: s
             continue
         if ctype and ctype not in [c.lower() for c in p.get("customer_types", [])]:
             continue
-        hits = 0
+        score = 0
         if tokens:
-            hay = _haystack(p)
-            hits = sum(1 for t in tokens if _token_matches(t, hay))
-            if hits == 0:
+            score = sum(_token_score(t, p) for t in tokens)
+            if score == 0:
                 continue
-        scored.append((hits, p))
+        scored.append((score, p))
     # Rank by how many query tokens matched, so "ice machine" puts the ice machine first
     # instead of burying it behind everything that merely matched "machine". Python's
     # sort is stable, so equal scores keep catalogue order.
@@ -118,9 +175,12 @@ def recommend(products: list, business_type: str, needs: list) -> list:
     for p in pool:
         types = [c.lower() for c in p.get("customer_types", [])]
         score = 2 if bt and bt in types else 0
-        hay = _haystack(p)
-        matched = [n for n in needs if any(_token_matches(tok, hay) for tok in n.split())]
-        score += len(matched)
+        matched = []
+        for need in needs:
+            hit = sum(_token_score(tok, p) for tok in need.split())
+            if hit:
+                matched.append(need)
+                score += hit
         if score == 0:
             continue
         scored.append((score, {**p, "why": _why(p, matched, bt)}))

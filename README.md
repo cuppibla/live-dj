@@ -39,7 +39,7 @@ Everything company-specific lives in one directory. Nothing about Kittichet is i
 company-configs/
 ├── kittichet/          # the first demonstration configuration
 │   ├── persona.md          # who the consultant is, how it qualifies, what it must never do
-│   ├── products.json       # 18 demo product families
+│   ├── products.json       # 55 product families across 22 categories
 │   └── sales-rules.json    # identity, language, segments, safety rules, enquiry prefix
 └── default/            # generic, English — the unconfigured product
 ```
@@ -64,7 +64,7 @@ code change. That's the whole claim, and it's one command to check.
 | `backend/raw_minimal.py` | the 39-line voice-only extract (from upstream, unmodified) |
 | `backend/gotcha_send_client_content.py` | the wrong-way/right-way example (from upstream, unmodified) |
 | `frontend/` | 16 kHz mic worklet, 24 kHz playback, client-side barge-in, requirement + recommendation + enquiry panels |
-| `tests/test_sales.py` | 18 tests over the config, catalogue, and tool layer |
+| `tests/test_sales.py` | 55 tests over the config, catalogue, and tool layer |
 | `docs/DEMO_SCRIPT.md` | the 90-second presentation path and acceptance checklist |
 | `docs/brainstorm.md` | the product thinking this was built from |
 
@@ -80,6 +80,15 @@ reasoning from data instead of inventing one.
 **Enquiries can't skip confirmation.** `create_sales_enquiry` returns `not_confirmed` and emits
 nothing to the UI unless `confirmed=true`. The prompt asks the assistant to summarise and get a
 spoken yes; the tool makes it impossible to submit without one.
+
+**Brands stay at portfolio level.** The catalogue records the brands Kittichet is genuinely an
+authorized distributor for — Kimberly-Clark, Ecolab, 3M, Ocean Glass, Twinfish, Fest, Kärcher,
+Royal Umbrella and others — against the category they belong to. The assistant may say "for
+washroom systems we carry Kimberly-Clark", because that is true. It may not produce a model name,
+model number, specification, dilution rate, or certification, and `specifications` is empty on
+every record by design: invented detail that looks precise is more dangerous than detail that
+looks vague, because nobody questions a number. A test enforces that no product name reads as a
+brand SKU.
 
 Prices, availability, specifications, and chemical safety are never answered — the assistant says
 so and offers a human specialist.

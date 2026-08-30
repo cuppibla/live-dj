@@ -93,14 +93,16 @@ def _remember(items: list, source: str) -> list:
 def _brief(p: dict) -> dict:
     """The handoff view of a product — what a salesperson needs to act on it."""
     return {"id": p["id"], "name": p["name"], "name_th": p.get("name_th", ""),
-            "category": p["category"], "interest": p.get("interest")}
+            "category": p["category"], "brands": p.get("brands", []),
+            "interest": p.get("interest")}
 
 
 def _slim(p: dict) -> dict:
     """What the model and the UI actually need — never the whole record."""
     out = {
         "id": p["id"], "name": p["name"], "name_th": p.get("name_th", ""),
-        "category": p["category"], "benefits": p.get("benefits", []),
+        "category": p["category"], "brands": p.get("brands", []),
+        "benefits": p.get("benefits", []),
         "price_status": p["price_status"], "availability_status": p["availability_status"],
         "demo_only": p.get("demo_only", True),
     }

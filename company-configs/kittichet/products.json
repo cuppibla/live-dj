@@ -1,27 +1,28 @@
 [
   {
-    "id": "demo-product-001",
-    "name": "Demo Controlled Tissue Dispenser",
-    "name_th": "เครื่องจ่ายกระดาษทิชชูแบบควบคุมปริมาณ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-tissue-dispenser-controlled",
+    "name": "Controlled Tissue Dispenser System",
+    "name_th": "ระบบเครื่องจ่ายกระดาษชำระแบบควบคุมปริมาณ",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "washroom_dispenser",
     "customer_types": [
       "hotel",
       "restaurant",
-      "office",
       "hospital",
-      "pharmacy",
+      "clinic",
       "retail",
-      "clinic"
+      "office"
     ],
     "use_cases": [
-      "high-traffic washroom",
-      "consumption control",
+      "high-traffic public washroom",
+      "controlling tissue consumption",
       "guest-facing washroom"
     ],
     "benefits": [
-      "controlled dispensing reduces tissue waste",
-      "consistent premium appearance",
+      "dispenses a controlled amount so usage drops without rationing",
+      "keeps a consistent, tidy washroom appearance",
       "fewer refill rounds for housekeeping"
     ],
     "specifications": {},
@@ -30,27 +31,29 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-002",
-    "name": "Demo Jumbo Roll Dispenser",
-    "name_th": "เครื่องจ่ายกระดาษชำระม้วนใหญ่ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-tissue-dispenser-jumbo",
+    "name": "Jumbo Roll Tissue Dispenser",
+    "name_th": "เครื่องจ่ายกระดาษชำระม้วนใหญ่",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "washroom_dispenser",
     "customer_types": [
       "factory",
       "office",
       "hospital",
+      "clinic",
       "pharmacy",
-      "retail",
-      "clinic"
+      "retail"
     ],
     "use_cases": [
       "very high traffic washroom",
-      "low maintenance staff washroom",
-      "large site with few housekeeping rounds"
+      "staff washroom on a large site",
+      "few housekeeping rounds per day"
     ],
     "benefits": [
-      "long refill interval",
-      "lower cost per user",
+      "long interval between refills",
+      "low cost per user at volume",
       "simple for staff to service"
     ],
     "specifications": {},
@@ -59,18 +62,20 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-003",
-    "name": "Demo Sensor Hand Towel Dispenser",
-    "name_th": "เครื่องจ่ายกระดาษเช็ดมือแบบเซ็นเซอร์ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-towel-dispenser-sensor",
+    "name": "Sensor Hand Towel Dispenser",
+    "name_th": "เครื่องจ่ายกระดาษเช็ดมือแบบเซ็นเซอร์",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "washroom_dispenser",
     "customer_types": [
       "hotel",
       "hospital",
+      "clinic",
       "office",
-      "pharmacy",
       "retail",
-      "clinic"
+      "pharmacy"
     ],
     "use_cases": [
       "touch-free washroom",
@@ -78,9 +83,9 @@
       "premium guest washroom"
     ],
     "benefits": [
-      "no contact with the dispenser surface",
-      "controlled sheet-by-sheet dispensing",
-      "modern washroom appearance"
+      "no hand contact with the dispenser",
+      "one sheet at a time controls usage",
+      "reads as a modern, well-run washroom"
     ],
     "specifications": {},
     "price_status": "contact_sales",
@@ -88,26 +93,92 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-004",
-    "name": "Demo Premium Toilet Tissue Roll",
-    "name_th": "กระดาษชำระเกรดพรีเมียม (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-towel-dispenser-interfold",
+    "name": "Interfold Hand Towel Dispenser",
+    "name_th": "เครื่องจ่ายกระดาษเช็ดมือแบบแผ่นสอด",
+    "brands": [
+      "Kimberly-Clark"
+    ],
+    "category": "washroom_dispenser",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "public washroom",
+      "kitchen hand-drying station",
+      "back-of-house washroom"
+    ],
+    "benefits": [
+      "single-sheet dispensing keeps the stack hygienic",
+      "simple, low-maintenance mechanism"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-soap-dispenser-wall",
+    "name": "Wall-Mounted Soap Dispenser",
+    "name_th": "เครื่องจ่ายสบู่แบบติดผนัง",
+    "brands": [
+      "Kimberly-Clark",
+      "Ecolab"
+    ],
+    "category": "washroom_dispenser",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "public washroom",
+      "kitchen hand hygiene",
+      "clinical hand-wash point"
+    ],
+    "benefits": [
+      "sealed cartridge avoids topping-up contamination",
+      "controlled dose per wash"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-toilet-tissue-premium",
+    "name": "Premium Toilet Tissue",
+    "name_th": "กระดาษชำระเกรดพรีเมียม",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "toilet_tissue",
     "customer_types": [
       "hotel",
       "restaurant",
       "office",
-      "pharmacy",
       "retail",
       "clinic"
     ],
     "use_cases": [
       "guest room",
       "guest-facing washroom",
-      "restaurant washroom"
+      "meeting and event area"
     ],
     "benefits": [
-      "soft feel appropriate to guest expectations",
+      "softness appropriate to a guest-facing setting",
       "consistent presentation in the room"
     ],
     "specifications": {},
@@ -116,28 +187,30 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-005",
-    "name": "Demo High-Yield Jumbo Toilet Tissue",
-    "name_th": "กระดาษชำระม้วนใหญ่ปริมาณสูง (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-toilet-tissue-jumbo",
+    "name": "Jumbo Roll Toilet Tissue",
+    "name_th": "กระดาษชำระม้วนใหญ่",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "toilet_tissue",
     "customer_types": [
       "factory",
       "office",
       "hospital",
+      "clinic",
       "pharmacy",
-      "retail",
-      "clinic"
+      "retail"
     ],
     "use_cases": [
       "staff washroom",
-      "high consumption site",
-      "consumption control"
+      "high-consumption site",
+      "controlling consumption"
     ],
     "benefits": [
-      "fewer changes per week",
+      "fewer roll changes per week",
       "lower cost per user",
-      "pairs with the jumbo roll dispenser"
+      "pairs with the jumbo dispenser"
     ],
     "specifications": {},
     "price_status": "contact_sales",
@@ -145,19 +218,52 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-006",
-    "name": "Demo Interfold Hand Towel",
-    "name_th": "กระดาษเช็ดมือแบบแผ่นสอด (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-toilet-tissue-compact",
+    "name": "Compact Coreless Toilet Tissue",
+    "name_th": "กระดาษชำระแบบไร้แกนขนาดกะทัดรัด",
+    "brands": [
+      "Kimberly-Clark"
+    ],
+    "category": "toilet_tissue",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "small washroom with limited storage",
+      "reducing packaging waste",
+      "sustainability programme"
+    ],
+    "benefits": [
+      "no cardboard core to dispose of",
+      "more tissue in the same storage space"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-hand-towel-interfold",
+    "name": "Interfold Hand Towel",
+    "name_th": "กระดาษเช็ดมือแบบแผ่นสอด",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "paper_towel",
     "customer_types": [
       "hotel",
       "restaurant",
       "hospital",
-      "office",
+      "clinic",
       "pharmacy",
       "retail",
-      "clinic"
+      "factory",
+      "office"
     ],
     "use_cases": [
       "public washroom",
@@ -174,22 +280,24 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-007",
-    "name": "Demo Roll Hand Towel",
-    "name_th": "กระดาษเช็ดมือแบบม้วน (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-hand-towel-roll",
+    "name": "Roll Hand Towel",
+    "name_th": "กระดาษเช็ดมือแบบม้วน",
+    "brands": [
+      "Kimberly-Clark"
+    ],
     "category": "paper_towel",
     "customer_types": [
       "factory",
       "office",
-      "pharmacy",
       "retail",
+      "pharmacy",
       "clinic"
     ],
     "use_cases": [
       "high traffic washroom",
       "workshop hand drying",
-      "low maintenance site"
+      "continuous shift operation"
     ],
     "benefits": [
       "long refill interval",
@@ -201,19 +309,197 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-008",
-    "name": "Demo Foam Hand Soap",
-    "name_th": "สบู่ล้างมือชนิดโฟม (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-wiper-industrial",
+    "name": "Industrial Wiping Paper",
+    "name_th": "กระดาษเช็ดอเนกประสงค์สำหรับงานอุตสาหกรรม",
+    "brands": [
+      "Kimberly-Clark"
+    ],
+    "category": "wiping_paper",
+    "customer_types": [
+      "factory",
+      "hotel",
+      "restaurant"
+    ],
+    "use_cases": [
+      "machinery and oil wiping",
+      "workshop maintenance",
+      "back-of-house cleaning"
+    ],
+    "benefits": [
+      "holds together on oily surfaces where tissue tears",
+      "replaces rags without laundering"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-wiper-foodservice",
+    "name": "Food-Service Wiping Cloth",
+    "name_th": "ผ้าเช็ดสำหรับงานบริการอาหาร",
+    "brands": [
+      "Kimberly-Clark"
+    ],
+    "category": "wiping_paper",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory",
+      "hospital"
+    ],
+    "use_cases": [
+      "food preparation surface",
+      "front-of-house wiping",
+      "food-contact area cleaning"
+    ],
+    "benefits": [
+      "intended for food-contact wiping",
+      "single-use avoids cross-contamination between stations"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-facial-tissue-box",
+    "name": "Facial Tissue",
+    "name_th": "กระดาษเช็ดหน้าแบบกล่อง",
+    "brands": [
+      "Kimberly-Clark"
+    ],
+    "category": "facial_tissue",
+    "customer_types": [
+      "hotel",
+      "office",
+      "clinic",
+      "hospital",
+      "pharmacy",
+      "retail"
+    ],
+    "use_cases": [
+      "guest room amenity",
+      "reception and meeting room",
+      "consulting room"
+    ],
+    "benefits": [
+      "standard guest-room and desk amenity",
+      "presentation suited to guest-facing areas"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-air-freshener-dispenser",
+    "name": "Programmable Air Freshener Dispenser",
+    "name_th": "เครื่องจ่ายน้ำหอมปรับอากาศแบบตั้งเวลา",
+    "brands": [
+      "PIEXO",
+      "KODO"
+    ],
+    "category": "air_care",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "public washroom",
+      "corridor and lift lobby",
+      "odour control"
+    ],
+    "benefits": [
+      "scheduled dosing keeps intensity even through the day",
+      "addresses odour continuously rather than only when someone notices"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-fragrance-refill",
+    "name": "Commercial Fragrance Refill Range",
+    "name_th": "น้ำหอมสำหรับระบบปรับอากาศเชิงพาณิชย์",
+    "brands": [
+      "PIEXO",
+      "KODO"
+    ],
+    "category": "air_care",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "washroom scenting",
+      "public area scenting",
+      "brand scent programme"
+    ],
+    "benefits": [
+      "scent selected to suit the space during consultation",
+      "consistent supply for an ongoing programme"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-scent-diffuser-lobby",
+    "name": "Lobby Scent Diffuser System",
+    "name_th": "ระบบกระจายกลิ่นสำหรับพื้นที่ส่วนกลาง",
+    "brands": [
+      "KODO"
+    ],
+    "category": "air_care",
+    "customer_types": [
+      "hotel",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "lobby and reception",
+      "retail floor",
+      "brand experience"
+    ],
+    "benefits": [
+      "covers a large open area evenly",
+      "supports a consistent brand impression at the entrance"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-foam-hand-soap",
+    "name": "Foam Hand Soap",
+    "name_th": "สบู่ล้างมือชนิดโฟม",
+    "brands": [
+      "Kimberly-Clark",
+      "Ecolab"
+    ],
     "category": "hand_hygiene",
     "customer_types": [
       "hotel",
       "restaurant",
       "hospital",
-      "office",
+      "clinic",
       "pharmacy",
       "retail",
-      "clinic"
+      "factory",
+      "office"
     ],
     "use_cases": [
       "public washroom",
@@ -221,7 +507,7 @@
       "kitchen hand hygiene"
     ],
     "benefits": [
-      "foam format uses less product per wash",
+      "foam spreads further so less product per wash",
       "gentle enough for frequent washing"
     ],
     "specifications": {},
@@ -230,25 +516,58 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-009",
-    "name": "Demo Alcohol Hand Sanitiser Gel",
-    "name_th": "เจลแอลกอฮอล์ทำความสะอาดมือ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-antibacterial-hand-soap",
+    "name": "Antibacterial Hand Soap",
+    "name_th": "สบู่ล้างมือชนิดยับยั้งแบคทีเรีย",
+    "brands": [
+      "Ecolab"
+    ],
     "category": "hand_hygiene",
     "customer_types": [
       "hospital",
+      "clinic",
+      "pharmacy",
       "hotel",
-      "factory",
-      "office",
+      "restaurant",
+      "factory"
+    ],
+    "use_cases": [
+      "food handling area",
+      "clinical hand-wash point",
+      "infection-control protocol"
+    ],
+    "benefits": [
+      "formulated for frequent washing in food and care settings",
+      "fits a documented hand-hygiene routine"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-hand-sanitiser-gel",
+    "name": "Alcohol Hand Sanitiser Gel",
+    "name_th": "เจลแอลกอฮอล์ทำความสะอาดมือ",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "hand_hygiene",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
       "pharmacy",
       "retail",
-      "clinic"
+      "factory",
+      "office"
     ],
     "use_cases": [
       "lobby and entrance point",
       "infection-control area",
-      "food handling area",
-      "meeting room"
+      "meeting room",
+      "retail counter"
     ],
     "benefits": [
       "hand hygiene away from a washbasin",
@@ -260,30 +579,29 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-010",
-    "name": "Demo Multi-Surface Cleaner Concentrate",
-    "name_th": "น้ำยาทำความสะอาดอเนกประสงค์ชนิดเข้มข้น (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
-    "category": "cleaning_chemical",
+    "id": "kt-sanitiser-stand",
+    "name": "Sanitiser Dispenser Stand",
+    "name_th": "ขาตั้งเครื่องจ่ายเจลล้างมือ",
+    "brands": [
+      "Cleanatic"
+    ],
+    "category": "hand_hygiene",
     "customer_types": [
       "hotel",
       "restaurant",
-      "office",
-      "factory",
-      "pharmacy",
+      "hospital",
+      "clinic",
       "retail",
-      "clinic"
+      "office"
     ],
     "use_cases": [
-      "guest room housekeeping",
-      "public area cleaning",
-      "daily surface cleaning",
-      "housekeeping trolley kit"
+      "entrance and lobby",
+      "event and banquet area",
+      "queue and counter point"
     ],
     "benefits": [
-      "one product covers most daily surfaces",
-      "concentrate reduces storage space",
-      "simpler training for housekeeping staff"
+      "freestanding, no wall fixing required",
+      "places hygiene where people already stop"
     ],
     "specifications": {},
     "price_status": "contact_sales",
@@ -291,14 +609,143 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-011",
-    "name": "Demo Heavy-Duty Kitchen Degreaser",
-    "name_th": "น้ำยาขจัดคราบไขมันสำหรับครัว (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-multi-surface-cleaner",
+    "name": "Multi-Surface Cleaner Concentrate",
+    "name_th": "น้ำยาทำความสะอาดอเนกประสงค์ชนิดเข้มข้น",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "cleaning_chemical",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "guest room housekeeping",
+      "public area cleaning",
+      "daily surface cleaning"
+    ],
+    "benefits": [
+      "one product covers most daily surfaces",
+      "concentrate reduces storage space",
+      "simpler training for cleaning staff"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-glass-cleaner",
+    "name": "Glass and Mirror Cleaner",
+    "name_th": "น้ำยาเช็ดกระจก",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "cleaning_chemical",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "mirrors and glass partitions",
+      "shopfront and display glass",
+      "guest room mirrors"
+    ],
+    "benefits": [
+      "finishes without streaking on large glass",
+      "suited to daily front-of-house rounds"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-washroom-descaler",
+    "name": "Washroom and Descaling Cleaner",
+    "name_th": "น้ำยาทำความสะอาดห้องน้ำและขจัดคราบหินปูน",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "cleaning_chemical",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "washroom deep clean",
+      "hard-water scale on fittings",
+      "daily washroom round"
+    ],
+    "benefits": [
+      "targets scale that general cleaner leaves behind",
+      "keeps fittings looking maintained"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-floor-cleaner-neutral",
+    "name": "Neutral Floor Cleaner",
+    "name_th": "น้ำยาถูพื้นสูตรเป็นกลาง",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "cleaning_chemical",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "daily floor mopping",
+      "sealed and finished floors",
+      "large public floor area"
+    ],
+    "benefits": [
+      "neutral formula suits most finished floors",
+      "safe choice where floor types are mixed"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-kitchen-degreaser",
+    "name": "Heavy-Duty Kitchen Degreaser",
+    "name_th": "น้ำยาขจัดคราบไขมันสำหรับครัว",
+    "brands": [
+      "Ecolab"
+    ],
     "category": "degreaser",
     "customer_types": [
-      "restaurant",
       "hotel",
+      "restaurant",
       "factory"
     ],
     "use_cases": [
@@ -308,7 +755,7 @@
       "food production area"
     ],
     "benefits": [
-      "designed for heavy cooking soil",
+      "cuts heavy cooking soil that general cleaner cannot",
       "reduces manual scrubbing time"
     ],
     "specifications": {},
@@ -317,26 +764,59 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-012",
-    "name": "Demo Surface Disinfectant Category",
-    "name_th": "กลุ่มผลิตภัณฑ์ฆ่าเชื้อบนพื้นผิว (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-oven-grill-cleaner",
+    "name": "Oven and Grill Cleaner",
+    "name_th": "น้ำยาทำความสะอาดเตาอบและเตาย่าง",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "degreaser",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory"
+    ],
+    "use_cases": [
+      "oven and grill deep clean",
+      "carbonised soil removal",
+      "periodic kitchen deep clean"
+    ],
+    "benefits": [
+      "formulated for baked-on soil",
+      "shortens a job that otherwise takes a shift"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-surface-disinfectant",
+    "name": "Surface Disinfectant Range",
+    "name_th": "กลุ่มผลิตภัณฑ์ฆ่าเชื้อบนพื้นผิว",
+    "brands": [
+      "Ecolab"
+    ],
     "category": "disinfectant",
     "customer_types": [
       "hospital",
+      "clinic",
+      "pharmacy",
       "hotel",
       "restaurant",
-      "pharmacy",
-      "clinic"
+      "hospital",
+      "clinic",
+      "retail",
+      "office"
     ],
     "use_cases": [
       "infection-control area",
       "high-touch surface",
-      "food contact area",
-      "guest room turnover"
+      "guest room turnover",
+      "consulting room"
     ],
     "benefits": [
-      "category selected with a specialist to match your protocol",
+      "range selected with a specialist to match your protocol",
       "supports a documented cleaning routine"
     ],
     "specifications": {},
@@ -345,18 +825,104 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-013",
-    "name": "Demo Floor Cleaning Pad Set",
-    "name_th": "ชุดแผ่นขัดพื้น (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
-    "category": "floor_care",
+    "id": "kt-food-contact-sanitiser",
+    "name": "Food-Contact Surface Sanitiser",
+    "name_th": "น้ำยาฆ่าเชื้อสำหรับพื้นผิวสัมผัสอาหาร",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "disinfectant",
     "customer_types": [
       "hotel",
+      "restaurant",
       "factory",
-      "office",
+      "hospital"
+    ],
+    "use_cases": [
+      "food preparation surface",
+      "food-contact equipment",
+      "kitchen close-down routine"
+    ],
+    "benefits": [
+      "intended for surfaces that touch food",
+      "fits a documented kitchen hygiene routine"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-warewash-programme",
+    "name": "Warewashing Detergent and Rinse Programme",
+    "name_th": "ชุดน้ำยาล้างจานและน้ำยาช่วยแห้งสำหรับเครื่องล้างจาน",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "dishwash_chemical",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory"
+    ],
+    "use_cases": [
+      "commercial dishwasher",
+      "glasswashing",
+      "banquet and high-volume service"
+    ],
+    "benefits": [
+      "detergent and rinse aid matched as a programme",
+      "protects glass clarity over repeated washes"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-laundry-programme",
+    "name": "Commercial Laundry Chemical Programme",
+    "name_th": "ชุดน้ำยาซักรีดเชิงพาณิชย์",
+    "brands": [
+      "Ecolab"
+    ],
+    "category": "laundry_chemical",
+    "customer_types": [
+      "hotel",
       "hospital",
+      "clinic"
+    ],
+    "use_cases": [
+      "in-house linen laundry",
+      "guest room linen",
+      "uniform and staff wear"
+    ],
+    "benefits": [
+      "programme built around your linen and machines",
+      "consistent linen appearance over many wash cycles"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-scrub-pad-floor",
+    "name": "Floor Scrubbing Pad Range",
+    "name_th": "กลุ่มแผ่นขัดพื้น",
+    "brands": [
+      "3M"
+    ],
+    "category": "scrubbing_pad",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
       "retail",
-      "pharmacy"
+      "factory",
+      "office"
     ],
     "use_cases": [
       "hard floor maintenance",
@@ -364,7 +930,7 @@
       "periodic deep clean"
     ],
     "benefits": [
-      "pad grade matched to your floor type during consultation",
+      "pad grade matched to your floor during consultation",
       "consistent finish across public areas"
     ],
     "specifications": {},
@@ -373,26 +939,27 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-014",
-    "name": "Demo Single-Disc Floor Machine",
-    "name_th": "เครื่องขัดพื้นแบบจานเดี่ยว (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
-    "category": "floor_equipment",
+    "id": "kt-scrub-pad-kitchen",
+    "name": "Kitchen Scouring Pad Range",
+    "name_th": "กลุ่มแผ่นขัดสำหรับงานครัว",
+    "brands": [
+      "3M"
+    ],
+    "category": "scrubbing_pad",
     "customer_types": [
       "hotel",
+      "restaurant",
       "factory",
-      "office",
-      "retail"
+      "hospital"
     ],
     "use_cases": [
-      "large hard floor area",
-      "lobby and corridor",
-      "periodic deep clean",
-      "reducing manual labour"
+      "pots and pans",
+      "kitchen surface scrubbing",
+      "griddle and equipment cleaning"
     ],
     "benefits": [
-      "covers large areas faster than manual cleaning",
-      "one machine serves scrubbing and polishing tasks"
+      "grades that clean without scratching the surface they are matched to",
+      "colour separation between kitchen tasks"
     ],
     "specifications": {},
     "price_status": "contact_sales",
@@ -400,15 +967,82 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-015",
-    "name": "Demo Housekeeping Trolley",
-    "name_th": "รถเข็นแม่บ้าน (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
-    "category": "floor_equipment",
+    "id": "kt-microfibre-cloth-set",
+    "name": "Colour-Coded Microfibre Cloth Set",
+    "name_th": "ชุดผ้าไมโครไฟเบอร์แยกสี",
+    "brands": [
+      "3M"
+    ],
+    "category": "cleaning_equipment",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "guest room housekeeping",
+      "colour-coded cleaning system",
+      "washroom versus surface separation"
+    ],
+    "benefits": [
+      "colour coding stops a washroom cloth reaching a food surface",
+      "reusable, so consumable spend drops"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-mop-system-flat",
+    "name": "Flat Mop and Bucket System",
+    "name_th": "ระบบไม้ถูพื้นแบบแบนพร้อมถัง",
+    "brands": [
+      "Cleanatic",
+      "3M"
+    ],
+    "category": "cleaning_equipment",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "daily floor mopping",
+      "large public floor area",
+      "corridor and guest floor"
+    ],
+    "benefits": [
+      "lighter and faster than a string mop over large areas",
+      "less water carried around the site"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-housekeeping-trolley",
+    "name": "Housekeeping Trolley",
+    "name_th": "รถเข็นแม่บ้าน",
+    "brands": [
+      "Cleanatic"
+    ],
+    "category": "cleaning_equipment",
     "customer_types": [
       "hotel",
       "hospital",
-      "retail"
+      "clinic"
     ],
     "use_cases": [
       "guest room housekeeping",
@@ -426,10 +1060,252 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-016",
-    "name": "Demo Restaurant Glassware Range",
-    "name_th": "กลุ่มแก้วสำหรับร้านอาหาร (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-janitorial-cart",
+    "name": "Janitorial Cleaning Cart",
+    "name_th": "รถเข็นทำความสะอาดสำหรับแม่บ้าน",
+    "brands": [
+      "Cleanatic"
+    ],
+    "category": "cleaning_equipment",
+    "customer_types": [
+      "factory",
+      "office",
+      "retail",
+      "hospital"
+    ],
+    "use_cases": [
+      "public area cleaning round",
+      "waste collection round",
+      "large site cleaning"
+    ],
+    "benefits": [
+      "carries a full round of equipment in one move",
+      "keeps cleaning equipment out of public sight lines"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-waste-bin-range",
+    "name": "Commercial Waste Bin Range",
+    "name_th": "กลุ่มถังขยะเชิงพาณิชย์",
+    "brands": [
+      "Cleanatic",
+      "MMK"
+    ],
+    "category": "cleaning_equipment",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "public area waste",
+      "back-of-house waste",
+      "waste separation programme"
+    ],
+    "benefits": [
+      "sizes and formats matched to each area during consultation",
+      "supports separated waste streams"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-safety-signage",
+    "name": "Wet Floor Safety Signage",
+    "name_th": "ป้ายเตือนพื้นเปียก",
+    "brands": [
+      "Cleanatic",
+      "YNC"
+    ],
+    "category": "cleaning_equipment",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "floor cleaning in public areas",
+      "slip prevention",
+      "cleaning during opening hours"
+    ],
+    "benefits": [
+      "visible warning while floors are being cleaned",
+      "lets cleaning happen without closing the area"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-floor-scrubber-walkbehind",
+    "name": "Walk-Behind Floor Scrubber",
+    "name_th": "เครื่องขัดพื้นแบบเดินตาม",
+    "brands": [
+      "Kärcher"
+    ],
+    "category": "floor_machine",
+    "customer_types": [
+      "hotel",
+      "factory",
+      "retail",
+      "hospital",
+      "office"
+    ],
+    "use_cases": [
+      "large hard floor area",
+      "daily floor cleaning at scale",
+      "reducing manual labour"
+    ],
+    "benefits": [
+      "washes and dries in one pass so the floor reopens sooner",
+      "covers large areas far faster than mopping"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-floor-polisher-single",
+    "name": "Single-Disc Floor Polisher",
+    "name_th": "เครื่องขัดพื้นแบบจานเดี่ยว",
+    "brands": [
+      "เครื่องขัดไทย",
+      "Boonchote Trading"
+    ],
+    "category": "floor_machine",
+    "customer_types": [
+      "hotel",
+      "factory",
+      "office",
+      "retail"
+    ],
+    "use_cases": [
+      "floor polishing and deep scrub",
+      "lobby and corridor",
+      "periodic restoration"
+    ],
+    "benefits": [
+      "one machine handles scrubbing and polishing with a pad change",
+      "restores appearance without replacing the floor"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-vacuum-wet-dry",
+    "name": "Wet and Dry Vacuum Cleaner",
+    "name_th": "เครื่องดูดฝุ่นและดูดน้ำ",
+    "brands": [
+      "Kärcher"
+    ],
+    "category": "floor_machine",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "clinic",
+      "pharmacy",
+      "retail",
+      "factory",
+      "office"
+    ],
+    "use_cases": [
+      "spill recovery",
+      "back-of-house cleaning",
+      "carpet and hard floor"
+    ],
+    "benefits": [
+      "handles both spills and dry debris",
+      "useful across housekeeping and maintenance teams"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-carpet-extractor",
+    "name": "Carpet Extraction Machine",
+    "name_th": "เครื่องซักพรมแบบฉีดและดูดกลับ",
+    "brands": [
+      "Kärcher"
+    ],
+    "category": "floor_machine",
+    "customer_types": [
+      "hotel",
+      "office",
+      "retail"
+    ],
+    "use_cases": [
+      "guest room and corridor carpet",
+      "meeting and function room",
+      "periodic carpet restoration"
+    ],
+    "benefits": [
+      "lifts soil out of the pile rather than moving it around",
+      "extends the life of an expensive floor covering"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-pressure-washer",
+    "name": "High-Pressure Washer",
+    "name_th": "เครื่องฉีดน้ำแรงดันสูง",
+    "brands": [
+      "Kärcher"
+    ],
+    "category": "pressure_washer",
+    "customer_types": [
+      "factory",
+      "hotel",
+      "restaurant",
+      "retail"
+    ],
+    "use_cases": [
+      "external area and car park",
+      "bin store and loading bay",
+      "kitchen back area",
+      "facade and hard standing"
+    ],
+    "benefits": [
+      "clears heavy external soiling that manual cleaning cannot",
+      "cuts the time an outdoor clean takes"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-glassware-range",
+    "name": "Professional Glassware Range",
+    "name_th": "กลุ่มแก้วสำหรับงานบริการมืออาชีพ",
+    "brands": [
+      "Ocean Glass"
+    ],
     "category": "glassware",
     "customer_types": [
       "hotel",
@@ -437,12 +1313,11 @@
     ],
     "use_cases": [
       "restaurant service",
-      "bar service",
-      "banquet and meeting room",
-      "breakfast service"
+      "breakfast service",
+      "banquet and meeting room"
     ],
     "benefits": [
-      "consistent look across the restaurant",
+      "consistent look across the whole restaurant",
       "range sized to your service style during consultation"
     ],
     "specifications": {},
@@ -451,14 +1326,129 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-017",
-    "name": "Demo Compostable Food Packaging",
-    "name_th": "บรรจุภัณฑ์อาหารย่อยสลายได้ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-barware-range",
+    "name": "Barware and Cocktail Glass Range",
+    "name_th": "กลุ่มแก้วบาร์และค็อกเทล",
+    "brands": [
+      "Ocean Glass"
+    ],
+    "category": "glassware",
+    "customer_types": [
+      "hotel",
+      "restaurant"
+    ],
+    "use_cases": [
+      "bar service",
+      "cocktail programme",
+      "poolside and lounge service"
+    ],
+    "benefits": [
+      "shapes matched to the drinks you actually serve",
+      "presentation appropriate to a bar programme"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-cutlery-stainless",
+    "name": "Stainless Steel Cutlery Range",
+    "name_th": "กลุ่มช้อนส้อมสเตนเลส",
+    "brands": [
+      "Twinfish"
+    ],
+    "category": "tableware",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital"
+    ],
+    "use_cases": [
+      "restaurant table setting",
+      "banquet service",
+      "staff canteen"
+    ],
+    "benefits": [
+      "finish that survives commercial warewashing",
+      "patterns available as a continuing range for replacement"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-tableware-service",
+    "name": "Dining and Service Tableware",
+    "name_th": "อุปกรณ์บนโต๊ะอาหารและงานบริการ",
+    "brands": [
+      "Twinfish",
+      "MMK"
+    ],
+    "category": "tableware",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital"
+    ],
+    "use_cases": [
+      "restaurant table setting",
+      "buffet and banquet service",
+      "room service"
+    ],
+    "benefits": [
+      "coherent table presentation across services",
+      "replaceable from a continuing range"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-kitchen-smallware",
+    "name": "Commercial Kitchen Smallwares",
+    "name_th": "อุปกรณ์เครื่องครัวเชิงพาณิชย์",
+    "brands": [
+      "Twinfish",
+      "YNC",
+      "MMK"
+    ],
+    "category": "kitchenware",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory",
+      "hospital"
+    ],
+    "use_cases": [
+      "commercial kitchen preparation",
+      "food storage and handling",
+      "kitchen fit-out"
+    ],
+    "benefits": [
+      "built for commercial rather than domestic use",
+      "one supplier for a full kitchen list"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-food-box-fibre",
+    "name": "Natural Fibre Food Box Range",
+    "name_th": "กล่องข้าวเยื่อธรรมชาติ",
+    "brands": [
+      "Fest"
+    ],
     "category": "food_packaging",
     "customer_types": [
+      "hotel",
       "restaurant",
-      "hotel"
+      "retail",
+      "hospital"
     ],
     "use_cases": [
       "takeaway service",
@@ -467,8 +1457,8 @@
       "sustainability programme"
     ],
     "benefits": [
-      "supports an environmental positioning you can show guests",
-      "replaces single-use plastic in takeaway service"
+      "replaces single-use plastic in takeaway service",
+      "supports an environmental position you can show guests"
     ],
     "specifications": {},
     "price_status": "contact_sales",
@@ -476,14 +1466,126 @@
     "demo_only": true
   },
   {
-    "id": "demo-product-018",
-    "name": "Demo Modular Ice Machine",
-    "name_th": "เครื่องผลิตน้ำแข็งแบบโมดูลาร์ (ตัวอย่างสาธิต)",
-    "brand": "Approved brand",
+    "id": "kt-cup-lid-eco",
+    "name": "Eco Cup and Lid Range",
+    "name_th": "กลุ่มแก้วและฝาที่เป็นมิตรกับสิ่งแวดล้อม",
+    "brands": [
+      "Fest"
+    ],
+    "category": "food_packaging",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "takeaway beverage",
+      "coffee service",
+      "event catering"
+    ],
+    "benefits": [
+      "cup and lid matched as a system",
+      "fits a stated sustainability commitment"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-food-container-deli",
+    "name": "Deli and Takeaway Container Range",
+    "name_th": "กลุ่มบรรจุภัณฑ์อาหารสำเร็จรูปและเดลิ",
+    "brands": [
+      "Fest"
+    ],
+    "category": "food_packaging",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "retail"
+    ],
+    "use_cases": [
+      "deli and grab-and-go counter",
+      "delivery service",
+      "portioned food display"
+    ],
+    "benefits": [
+      "presents food well at the point of sale",
+      "formats matched to your menu during consultation"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-rice-jasmine",
+    "name": "Premium Jasmine Rice",
+    "name_th": "ข้าวหอมมะลิเกรดพรีเมียม",
+    "brands": [
+      "Royal Umbrella Rice / ข้าวตราฉัตร"
+    ],
+    "category": "rice",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory",
+      "hospital"
+    ],
+    "use_cases": [
+      "restaurant and banquet catering",
+      "staff canteen",
+      "room service"
+    ],
+    "benefits": [
+      "consistent grade across deliveries",
+      "recognised brand for guest-facing dining"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-rice-commercial-supply",
+    "name": "Commercial Rice Supply Programme",
+    "name_th": "โปรแกรมจัดส่งข้าวสำหรับงานเชิงพาณิชย์",
+    "brands": [
+      "Royal Umbrella Rice / ข้าวตราฉัตร"
+    ],
+    "category": "rice",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "factory",
+      "hospital"
+    ],
+    "use_cases": [
+      "high-volume kitchen",
+      "scheduled recurring delivery",
+      "staff canteen"
+    ],
+    "benefits": [
+      "volume and schedule agreed with a consultant",
+      "one supplier alongside the rest of the kitchen list"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-ice-machine-modular",
+    "name": "Modular Ice Machine",
+    "name_th": "เครื่องทำน้ำแข็งแบบโมดูลาร์",
+    "brands": [],
     "category": "ice_machine",
     "customer_types": [
       "hotel",
-      "restaurant"
+      "restaurant",
+      "retail"
     ],
     "use_cases": [
       "hotel beverage service",
@@ -494,6 +1596,32 @@
     "benefits": [
       "continuous ice supply for food service",
       "capacity sized to daily consumption during consultation"
+    ],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "kt-ice-machine-undercounter",
+    "name": "Undercounter Ice Machine",
+    "name_th": "เครื่องทำน้ำแข็งแบบใต้เคาน์เตอร์",
+    "brands": [],
+    "category": "ice_machine",
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "retail",
+      "office"
+    ],
+    "use_cases": [
+      "bar and coffee counter",
+      "small restaurant",
+      "limited back-of-house space"
+    ],
+    "benefits": [
+      "fits under a service counter where floor space is tight",
+      "puts ice at the point it is used"
     ],
     "specifications": {},
     "price_status": "contact_sales",

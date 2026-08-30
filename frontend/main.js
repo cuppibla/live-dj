@@ -88,7 +88,8 @@ function renderCards(host, items) {
     const bits = [
       ["name", p.name],
       ["th", p.name_th || ""],
-      ["cat", (p.category || "").replace(/_/g, " ")],
+      ["cat", [(p.category || "").replace(/_/g, " "),
+               (p.brands || []).join(" · ")].filter(Boolean).join("  ·  ")],
       ["why", p.why || (p.benefits || []).slice(0, 2).join(" · ")],
     ];
     bits.forEach(([cls, text]) => {

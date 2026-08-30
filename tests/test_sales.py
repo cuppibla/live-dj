@@ -208,9 +208,9 @@ def test_shortlist_accumulates_across_calls():
     tools.reset_state()
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
     events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
-    names = [i["name"] for i in events[0]["items"]]
-    assert any("Ice Machine" in n for n in names)
-    assert any("Dispenser" in n or "Tissue" in n or "Towel" in n for n in names)
+    cats = [i["category"] for i in events[0]["items"]]
+    assert "ice_machine" in cats
+    assert any(c in ("washroom_dispenser", "toilet_tissue", "paper_towel") for c in cats)
 
 
 def test_shortlist_puts_the_newest_batch_first():
@@ -233,9 +233,9 @@ def test_shortlist_marks_where_each_item_came_from():
     tools.reset_state()
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
     events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
-    by_name = {i["name"]: i["source"] for i in events[0]["items"]}
-    assert by_name["Demo Modular Ice Machine"] == "looked_up"
-    assert "recommended" in by_name.values()
+    by_id = {i["id"]: i["source"] for i in events[0]["items"]}
+    assert by_id["kt-ice-machine-modular"] == "looked_up"
+    assert "recommended" in by_id.values()
 
 
 def test_shortlist_is_capped():
@@ -251,7 +251,7 @@ def test_shortlist_resets_with_the_session():
     events, _ = tools.dispatch_tool("capture_requirements", {"business_type": "hotel"})
     assert events[0]["type"] == "requirements"
     events, _ = tools.dispatch_tool("search_products", {"query": "glassware"})
-    assert all("Glassware" in i["name"] for i in events[0]["items"])
+    assert events[0]["items"][0]["category"] == "glassware"
 
 
 def test_enquiry_carries_the_products_actually_discussed():
@@ -288,10 +288,10 @@ def test_customer_interest_marks_a_product_wanted():
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
     events, result = tools.dispatch_tool(
         "record_customer_interest",
-        {"products": ["demo-product-001"], "interest": "wanted"})
+        {"products": ["kt-tissue-dispenser-controlled"], "interest": "wanted"})
     wanted = [i for i in events[0]["items"] if i["interest"] == "wanted"]
-    assert [w["id"] for w in wanted] == ["demo-product-001"]
-    assert result["wanted"] == ["Demo Controlled Tissue Dispenser"]
+    assert [w["id"] for w in wanted] == ["kt-tissue-dispenser-controlled"]
+    assert result["wanted"] == ["Controlled Tissue Dispenser System"]
 
 
 def test_customer_interest_resolves_a_product_by_name():
@@ -299,24 +299,24 @@ def test_customer_interest_resolves_a_product_by_name():
     tools.reset_state()
     events, result = tools.dispatch_tool(
         "record_customer_interest", {"products": ["Modular Ice Machine"], "interest": "wanted"})
-    assert result["wanted"] == ["Demo Modular Ice Machine"]
+    assert result["wanted"] == ["Modular Ice Machine"]
     assert events[0]["items"][0]["interest"] == "wanted"
 
 
 def test_customer_interest_adds_a_product_not_yet_on_the_panel():
     tools.reset_state()
     events, _ = tools.dispatch_tool(
-        "record_customer_interest", {"products": ["demo-product-018"], "interest": "wanted"})
-    assert any(i["id"] == "demo-product-018" for i in events[0]["items"])
+        "record_customer_interest", {"products": ["kt-ice-machine-modular"], "interest": "wanted"})
+    assert any(i["id"] == "kt-ice-machine-modular" for i in events[0]["items"])
 
 
 def test_customer_interest_can_be_withdrawn():
     tools.reset_state()
     tools.dispatch_tool("record_customer_interest",
-                        {"products": ["demo-product-018"], "interest": "wanted"})
+                        {"products": ["kt-ice-machine-modular"], "interest": "wanted"})
     events, _ = tools.dispatch_tool("record_customer_interest",
-                                    {"products": ["demo-product-018"], "interest": "declined"})
-    item = next(i for i in events[0]["items"] if i["id"] == "demo-product-018")
+                                    {"products": ["kt-ice-machine-modular"], "interest": "declined"})
+    item = next(i for i in events[0]["items"] if i["id"] == "kt-ice-machine-modular")
     assert item["interest"] == "declined"
 
 
@@ -331,10 +331,10 @@ def test_wanted_products_survive_a_later_search():
     """What the customer asked for must not be pushed off the panel by browsing."""
     tools.reset_state()
     tools.dispatch_tool("record_customer_interest",
-                        {"products": ["demo-product-018"], "interest": "wanted"})
+                        {"products": ["kt-ice-machine-modular"], "interest": "wanted"})
     for q in ["dispenser", "tissue", "towel", "cleaner", "floor", "glass", "soap"]:
         events, _ = tools.dispatch_tool("search_products", {"query": q})
-    assert any(i["id"] == "demo-product-018" and i["interest"] == "wanted"
+    assert any(i["id"] == "kt-ice-machine-modular" and i["interest"] == "wanted"
                for i in events[0]["items"])
 
 
@@ -342,10 +342,101 @@ def test_enquiry_separates_wanted_from_merely_discussed():
     tools.reset_state()
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
     tools.dispatch_tool("record_customer_interest",
-                        {"products": ["demo-product-001"], "interest": "wanted"})
+                        {"products": ["kt-tissue-dispenser-controlled"], "interest": "wanted"})
     events, result = tools.dispatch_tool(
         "create_sales_enquiry", {"summary": "hotel washrooms", "confirmed": True})
-    assert [p["name"] for p in result["products_wanted"]] == ["Demo Controlled Tissue Dispenser"]
+    assert [p["name"] for p in result["products_wanted"]] == ["Controlled Tissue Dispenser System"]
     assert result["products_discussed"]
-    assert "demo-product-001" not in [p["id"] for p in result["products_discussed"]]
+    assert "kt-tissue-dispenser-controlled" not in [p["id"] for p in result["products_discussed"]]
     assert events[0]["products_wanted"]
+
+
+# --- real brands, portfolio level only ---
+
+def test_catalogue_is_broad_and_well_differentiated():
+    prods = CONFIG.products
+    assert len(prods) >= 50
+    assert len({p["category"] for p in prods}) >= 20
+    # every segment must have real coverage, so nothing gets mapped onto a near-miss
+    for seg in CONFIG.rules["customer_segments"]:
+        assert catalog.segment_covered(prods, seg), seg
+
+
+def test_no_product_carries_a_fabricated_specification():
+    """Invented detail that looks precise is more dangerous than detail that looks vague:
+    nobody questions a number. Specs come from Kittichet or they do not exist."""
+    for p in CONFIG.products:
+        assert p["specifications"] == {}
+        assert p["price_status"] == "contact_sales"
+        assert p["availability_status"] == "confirmation_required"
+
+
+def test_brands_are_real_and_declared():
+    declared = set(CONFIG.rules["authorized_brands"])
+    used = {b for p in CONFIG.products for b in p.get("brands", [])}
+    assert used <= declared, f"undeclared brand: {used - declared}"
+    assert "Kimberly-Clark" in declared and "Ecolab" in declared
+
+
+def test_no_product_name_claims_a_model():
+    """A real brand attached to an invented model number misrepresents that brand.
+    Names stay at category/family level."""
+    import re
+    for p in CONFIG.products:
+        assert not re.search(r"\b[A-Z]{1,4}[-\s]?\d{2,}\b", p["name"]), p["name"]
+        for b in p.get("brands", []):
+            assert b not in p["name"], f"{p['name']} presents itself as a {b} SKU"
+
+
+def test_search_finds_products_by_brand():
+    hits = catalog.search(CONFIG.products, query="Ecolab")
+    assert hits and all("Ecolab" in h["brands"] for h in hits)
+
+
+def test_brands_reach_the_model_and_the_ui():
+    _, result = tools.dispatch_tool(
+        "recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    assert any(r["brands"] for r in result["recommendations"])
+
+
+def test_instruction_names_the_brands_and_forbids_model_detail():
+    from backend.config import SYSTEM_INSTRUCTION
+    assert "Kimberly-Clark" in SYSTEM_INSTRUCTION
+    assert "authorized distributor" in SYSTEM_INSTRUCTION
+    assert "model number" in SYSTEM_INSTRUCTION
+
+
+# --- ranking at scale: the failure mode a bigger catalogue introduces ---
+
+def test_recommendations_lead_with_the_right_category():
+    """At 18 products almost everything tied and catalogue file order decided the
+    ranking. At 55 that meant a restaurant asking about kitchen degreasing was shown
+    hand towel dispensers. Ranking has to hold as the catalogue grows."""
+    cases = [
+        ("restaurant", ["kitchen degreasing", "dishwasher"], "degreaser"),
+        ("factory", ["floor cleaning machine"], "floor_machine"),
+        ("pharmacy", ["hand hygiene"], "hand_hygiene"),
+        ("hotel", ["laundry", "linen"], "laundry_chemical"),
+        ("restaurant", ["takeaway packaging"], "food_packaging"),
+        ("hotel", ["glassware for the restaurant"], "glassware"),
+        ("hotel", ["ice machine"], "ice_machine"),
+    ]
+    for business, needs, expected in cases:
+        top = catalog.recommend(CONFIG.products, business, needs)[0]
+        assert top["category"] == expected, f"{business}/{needs} -> {top['name']}"
+
+
+def test_an_exact_word_outranks_a_stem_match():
+    hits = catalog.search(CONFIG.products, query="glassware")
+    assert hits[0]["category"] == "glassware"
+
+
+def test_stemming_reaches_across_english_word_endings():
+    """A customer says "degreasing"; the catalogue says "degreaser"."""
+    assert catalog.search(CONFIG.products, query="degreasing")[0]["category"] == "degreaser"
+    assert catalog.search(CONFIG.products, query="polishing")
+
+
+def test_a_short_token_does_not_prefix_match_a_longer_word():
+    hits = catalog.search(CONFIG.products, query="Ecolab")
+    assert all("Ecolab" in h["brands"] for h in hits)

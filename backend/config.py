@@ -42,6 +42,8 @@ def load_config(profile: str) -> CompanyConfig:
 
 def build_instruction(cfg: CompanyConfig) -> str:
     categories = sorted({p["category"] for p in cfg.products})
+    brands = cfg.rules.get("authorized_brands") or []
+    brand_line = ", ".join(brands) if brands else "the brands in its catalogue"
     return f"""You are a professional AI sales consultant representing {cfg.company_name}.
 Your role: {cfg.assistant_role}.
 
@@ -57,6 +59,11 @@ salesperson. Ask ONE relevant question at a time and adapt it to the customer's 
 CATALOGUE: Use search_products and recommend_products for anything factual about products.
 Available categories: {", ".join(categories)}.
 Explain WHY a recommendation fits what the customer just told you.
+
+BRANDS: {cfg.company_name} is an authorized distributor for {brand_line}. Naming the brand behind
+a category is good selling and it is true — "for washroom systems we carry Kimberly-Clark". But
+the brand is as far as it goes: you do not know model names, model numbers, specifications,
+dilution rates or certifications for any of them, and you must never produce one.
 
 QUALIFICATION: Collect, conversationally and only when relevant:
 {", ".join(cfg.rules["qualification_fields"])}.

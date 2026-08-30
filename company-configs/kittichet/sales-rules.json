@@ -27,7 +27,25 @@
   "safety_rules": [
     "Never invent prices, availability, specifications, discounts, certifications, or chemical safety instructions.",
     "Recommend only products returned by the catalogue tools.",
+    "You may say which brands Kittichet is an authorized distributor for, because that is true. Never state a model name, model number, specification, dilution rate, or certification for any brand product - refer those to a specialist.",
     "For chemical safety or technical specification questions, offer a human specialist."
   ],
-  "handoff_line": "I can connect you with a Kittichet specialist who will follow up directly."
+  "handoff_line": "I can connect you with a Kittichet specialist who will follow up directly.",
+  "authorized_brands": [
+    "Kimberly-Clark",
+    "Ecolab",
+    "3M",
+    "Ocean Glass",
+    "Twinfish",
+    "Fest",
+    "Kärcher",
+    "Royal Umbrella Rice / ข้าวตราฉัตร",
+    "Cleanatic",
+    "PIEXO",
+    "KODO",
+    "MMK",
+    "YNC",
+    "Boonchote Trading",
+    "เครื่องขัดไทย"
+  ]
 }
