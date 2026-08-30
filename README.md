@@ -124,7 +124,14 @@ model simply never hears you.
   own voice set. The persona carries the character, not the timbre.
 - **Barge-in** is client-side: the browser cuts playback the instant the mic hears you (RMS gate in
   `frontend/main.js`), which feels faster than waiting for the server signal. The server forwards
-  `interrupted` too.
+  `interrupted` too. It needs sustained energy rather than one loud sample, and the remainder of a
+  cut turn is discarded — otherwise the tail of the reply arrives after the cut and plays as a
+  jump to the end of the sentence.
+- **Interruption can be switched off** for a loud room. There are two paths to interrupt and the
+  toggle closes both: it skips the client RMS gate, and it stops sending microphone audio while
+  the assistant speaks, so Gemini's own voice-activity detection has nothing to trigger on. That
+  works mid-call, and unlike the API's `NO_INTERRUPTION` it discards the room noise instead of
+  ingesting it as the next turn.
 - **Tools return instantly.** In a live session function calls are synchronous — the voice pauses
   until the tool returns, so every handler does list filtering and nothing else.
 - The model is **audio-only**; `response_modalities: ["TEXT"]` is rejected by

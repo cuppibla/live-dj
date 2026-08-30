@@ -5,6 +5,9 @@ const vm = require("vm");
 
 let sourcesCreated = 0;
 let sourcesStopped = 0;
+let sent = 0;
+const sockets = [];
+const workletNodes = [];
 
 function fakeEl() {
   const el = {
@@ -25,7 +28,10 @@ const ctx = {
   location: { protocol: "http:", host: "localhost:8000" },
   fetch: () => Promise.reject(new Error("no branding in test")),
   navigator: { mediaDevices: { getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }) } },
-  WebSocket: class { constructor() { this.readyState = 0; } close() {} send() {} },
+  WebSocket: class {
+    constructor() { this.readyState = 1; sockets.push(this); }
+    close() {} send() { sent++; }
+  },
 };
 ctx.window.AudioContext = class {
   constructor() {
@@ -44,7 +50,11 @@ ctx.window.AudioContext = class {
   close() {}
 };
 ctx.AudioContext = ctx.window.AudioContext;
-ctx.AudioWorkletNode = class { constructor() { this.port = {}; } connect() {} disconnect() {} };
+ctx.AudioWorkletNode = class {
+  constructor() { this.port = {}; workletNodes.push(this); }
+  connect() {} disconnect() {}
+};
+ctx.WebSocket.OPEN = 1;
 ctx.globalThis = ctx;
 
 vm.createContext(ctx);
@@ -89,6 +99,45 @@ function check(label, cond) {
   sourcesCreated = 0;
   ctx.playVoice(chunk());
   check("drain watchdog restores audio if turn_end never comes", sourcesCreated === 1);
+
+  // ---- hold-the-floor mode, for a room too loud to trust ----
+  ctx.connect();                                  // gives the worklet a socket to send on
+  const mic = (d) => workletNodes[0].port.onmessage({ data: d });
+  const LOUD = { pcm: new Int16Array(43).buffer, rms: 0.9 };
+  const QUIET = { pcm: new Int16Array(43).buffer, rms: 0.001 };
+
+  ctx.setInterruptible(true);
+  ctx.resumeVoice();
+  ctx.playVoice(chunk());                         // assistant starts speaking
+  sourcesStopped = 0;
+  for (let i = 0; i < 20; i++) mic(LOUD);
+  check("interruptible: sustained speech cuts the assistant off", sourcesStopped > 0);
+
+  ctx.resumeVoice();
+  ctx.playVoice(chunk());
+  sourcesStopped = 0;
+  mic(LOUD); mic(QUIET); mic(LOUD); mic(QUIET);
+  check("interruptible: a lone click does NOT cut it off", sourcesStopped === 0);
+
+  ctx.setInterruptible(false);
+  ctx.resumeVoice();
+  ctx.playVoice(chunk());                         // assistant speaking -> floor is held
+  sourcesStopped = 0; sent = 0;
+  for (let i = 0; i < 40; i++) mic(LOUD);
+  check("no-interruptions: room noise does not cut the assistant off", sourcesStopped === 0);
+  check("no-interruptions: no audio reaches Gemini while it speaks (blocks server VAD)",
+        sent === 0);
+
+  ctx.stopVoice(false); ctx.resumeVoice();
+  await new Promise((r) => setTimeout(r, 400));   // past HOLD_TAIL_MS
+  sent = 0;
+  for (let i = 0; i < 5; i++) mic(LOUD);
+  check("no-interruptions: mic reopens once the assistant stops", sent === 5);
+
+  ctx.setInterruptible(true);
+  sent = 0;
+  for (let i = 0; i < 5; i++) mic(QUIET);
+  check("interruptible: audio flows normally again", sent === 5);
 
   console.log(ok.every(Boolean) ? "\nALL PASS" : "\nFAILURES");
   process.exit(ok.every(Boolean) ? 0 : 1);

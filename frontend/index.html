@@ -55,6 +55,11 @@
     text-transform: uppercase; cursor: pointer; font-family: inherit; }
   button:hover { border-color: var(--accent); }
   button:disabled { opacity: 0.7; cursor: default; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .toggle { padding: 9px 16px; font-size: 10px; letter-spacing: 0.14em; }
+  .toggle.on { border-color: rgba(127,179,213,0.5); color: var(--accent); }
+  .toggle.off { border-color: rgba(232,184,125,0.55); color: var(--warm); }
+
   .hint { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
 
   .transcript { width: 100%; max-width: 460px; max-height: 190px; overflow-y: auto;
@@ -125,7 +130,10 @@
     <div class="voice">
       <div id="orb" class="orb idle"></div>
       <div id="status" class="status">tap to start, then talk</div>
-      <button id="talk">🎙 start call</button>
+      <div class="controls">
+        <button id="talk">🎙 start call</button>
+        <button id="interrupt" class="toggle on" title="Turn off in a loud room so noise cannot cut the assistant off">⚡ interruptible</button>
+      </div>
       <div class="hint">headphones on — or it hears itself</div>
       <div id="transcript" class="transcript"></div>
     </div>

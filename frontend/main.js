@@ -17,11 +17,14 @@ const BARGE_SUSTAIN = 8;          // consecutive loud quanta (~21 ms) before we 
 const DRAIN_MS = 600;             // how long a cut-off turn keeps arriving after we stop it
 const VOICE_RMS = 0.015;          // anything above this counts as someone being present
 const IDLE_MS = 120000;           // hang up after two minutes of true silence
+const HOLD_TAIL_MS = 250;         // keep holding briefly after the last audio, for the echo
 const talkBtn = $("talk");
+const interruptBtn = $("interrupt");
 
 let ws, audioCtx, workletNode, micStream, micSource;
 let live = false, idleTimer = null, lastVoiceAt = 0;
 let loudQuanta = 0, suppressTurn = false, drainTimer = null;
+let interruptible = true, lastSpokeAt = 0;
 let nextStart = 0;
 let activeSources = [];
 let speaking = false;
@@ -159,7 +162,31 @@ function playVoice(buf) {
   src.start(nextStart); nextStart += ab.duration;
   activeSources.push(src);
   src.onended = () => { activeSources = activeSources.filter((s) => s !== src); if (!activeSources.length) { speaking = false; setOrb("listening"); } };
-  speaking = true; setOrb("speaking");
+  speaking = true; lastSpokeAt = Date.now(); setOrb("speaking");
+}
+
+// "Hold the floor" mode, for a room too loud to trust.
+//
+// There are two ways the assistant gets interrupted, and a button that only handled ours
+// would be a trap: Gemini runs its own voice-activity detection on the audio we stream and
+// will stop generating mid-reply on its own — truncating the transcript too, which looks
+// worse than a clipped voice. Its VAD can only hear what we send it, so while the assistant
+// is speaking we send nothing at all. That defeats both paths, needs no reconnect, and
+// unlike the API's NO_INTERRUPTION it discards the room noise instead of feeding it in as
+// the next turn's input.
+function holdingFloor() {
+  return !interruptible && (speaking || suppressTurn
+                            || Date.now() - lastSpokeAt < HOLD_TAIL_MS);
+}
+
+function setInterruptible(on) {
+  interruptible = on;
+  loudQuanta = 0;
+  interruptBtn.textContent = on ? "⚡ interruptible" : "🔒 no interruptions";
+  interruptBtn.className = "toggle " + (on ? "on" : "off");
+  interruptBtn.title = on
+    ? "Talking over the assistant stops it. Turn off in a loud room."
+    : "The assistant finishes its sentence. Noise cannot cut it off, and neither can you.";
 }
 function stopVoice(suppressRest) {                                         // barge-in
   activeSources.forEach((s) => { try { s.stop(); } catch {} });
@@ -211,10 +238,15 @@ async function startMic() {
   micSource = audioCtx.createMediaStreamSource(micStream);
   workletNode = new AudioWorkletNode(audioCtx, "pcm-processor");
   workletNode.port.onmessage = (e) => {
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(e.data.pcm);       // 16k PCM up
-    // Sustained energy, not one loud sample — otherwise a click cuts the assistant off.
-    loudQuanta = e.data.rms >= BARGE_RMS ? loudQuanta + 1 : 0;
-    if (loudQuanta >= BARGE_SUSTAIN && speaking) { loudQuanta = 0; stopVoice(true); }
+    const hold = holdingFloor();
+    // Withholding the audio is what stops the SERVER interrupting; skipping the RMS check
+    // is what stops US doing it.
+    if (!hold && ws && ws.readyState === WebSocket.OPEN) ws.send(e.data.pcm);  // 16k PCM up
+    if (interruptible) {
+      // Sustained energy, not one loud sample — otherwise a click cuts the assistant off.
+      loudQuanta = e.data.rms >= BARGE_RMS ? loudQuanta + 1 : 0;
+      if (loudQuanta >= BARGE_SUSTAIN && speaking) { loudQuanta = 0; stopVoice(true); }
+    }
     if (e.data.rms >= VOICE_RMS) lastVoiceAt = Date.now();                 // someone is in the room
   };
   micSource.connect(workletNode);
@@ -280,6 +312,9 @@ async function go() {
     talkBtn.disabled = false;
   }
 }
+
+interruptBtn.addEventListener("click", () => setInterruptible(!interruptible));
+setInterruptible(true);
 
 talkBtn.addEventListener("click", () => {
   if (live) endCall("call ended — tap to start again");

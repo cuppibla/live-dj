@@ -20,6 +20,23 @@ Open <http://localhost:8000>. Before you tap anything, check the header reads
 - [ ] Backup video ready in case the network or the Live API misbehaves
 - [ ] API budget checked at <https://ai.studio/spend> — a spending cap stops the demo dead
 - [ ] **End the call** after each rehearsal run; an open tab keeps streaming audio and billing
+- [ ] Decide the interruption setting for the room — see below
+
+## If the room is loud
+
+The **⚡ interruptible / 🔒 no interruptions** button next to the mic decides whether the
+assistant can be cut off. Toggle it any time, including mid-call.
+
+- **⚡ interruptible** (default) — talking over it stops it instantly. This is the demo's headline
+  moment, so keep it on if the room is quiet and you have headphones.
+- **🔒 no interruptions** — the assistant finishes every sentence no matter how loud the room is.
+  Nothing reaches Gemini while it speaks, so neither audience noise nor its own voice through a
+  speaker can truncate it. **You cannot interrupt it either** — so if you switch this on, drop
+  step 3 from the path below and say the barge-in line instead of performing it.
+
+If you are presenting on speakers rather than headphones, switch it off and describe barge-in
+rather than demonstrating it. A clipped sentence in front of the customer costs more than the
+moment is worth.
 
 ## Opening line to the audience
 
@@ -35,7 +52,7 @@ Say these in order. Keep your own answers short — the assistant mirrors your p
 |---|---|---|
 | 1 | สวัสดีครับ ผมกำลังจะเปิดโรงแรม 80 ห้องที่เขาใหญ่ครับ | Requirements panel fills in: business type · location · scale |
 | 2 | มีห้องน้ำสาธารณะ 6 ห้อง อยากได้ภาพลักษณ์ดูพรีเมียม แต่คุมการใช้ทิชชูด้วยครับ | It asks about dispensing, not about what business you run |
-| 3 | **INTERRUPT IT MID-SENTENCE:** เดี๋ยวครับ แล้วน้ำยาทำความสะอาดล่ะครับ | Its voice cuts instantly. This is the moment worth the demo. |
+| 3 | **INTERRUPT IT MID-SENTENCE:** เดี๋ยวครับ แล้วน้ำยาทำความสะอาดล่ะครับ | Its voice cuts instantly. This is the moment worth the demo. *(Skip if 🔒 no interruptions is on.)* |
 | 4 | พื้นเป็นกระเบื้องกับพรมครับ มีห้องอาหารด้วย | Recommendation cards appear — housekeeping, floor care |
 | 5 | **Off the expected order:** มีเครื่องทำน้ำแข็งไหมครับ | It adapts, doesn't lose the thread |
 | 6 | ผมชื่อคุณสมชาย บริษัท เขาใหญ่ ฮอสพิทาลิตี้ เบอร์ 081-234-5678 ครับ | Contact fields land in the panel |
