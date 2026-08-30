@@ -9,13 +9,19 @@ const reqEl = $("requirements"), prodEl = $("products"), enqEl = $("enquiry");
 const wantEl = $("wanted"), wantPanel = $("wantedpanel");
 const companyEl = $("company");
 
-const BARGE_RMS = 0.02;
+// Barge-in has to survive a cough, a keyboard, and the assistant's own voice coming out of
+// a speaker. The worklet posts a message every 128 samples (~2.7 ms at 48 kHz), so a single
+// noisy quantum used to be enough to cut the assistant off mid-word.
+const BARGE_RMS = 0.035;
+const BARGE_SUSTAIN = 8;          // consecutive loud quanta (~21 ms) before we believe it
+const DRAIN_MS = 600;             // how long a cut-off turn keeps arriving after we stop it
 const VOICE_RMS = 0.015;          // anything above this counts as someone being present
 const IDLE_MS = 120000;           // hang up after two minutes of true silence
 const talkBtn = $("talk");
 
 let ws, audioCtx, workletNode, micStream, micSource;
 let live = false, idleTimer = null, lastVoiceAt = 0;
+let loudQuanta = 0, suppressTurn = false, drainTimer = null;
 let nextStart = 0;
 let activeSources = [];
 let speaking = false;
@@ -136,6 +142,11 @@ function renderEnquiry(m) {
 // ---------- voice playback (24k PCM from the server) ----------
 function playVoice(buf) {
   if (!audioCtx) return;                 // a frame can land in the gap after the call ends
+  // Cutting the assistant off only stops what is already queued. The server has no idea we
+  // did it and keeps streaming the rest of the turn, so those chunks used to arrive, find an
+  // empty queue and play at once — you heard the opening, a cut, then the tail. That is the
+  // "skips to the end" symptom. Drop the remainder instead.
+  if (suppressTurn) { armDrain(); return; }
   const int16 = new Int16Array(buf);
   const f32 = new Float32Array(int16.length);
   for (let i = 0; i < int16.length; i++) f32[i] = int16[i] / 0x8000;
@@ -150,9 +161,25 @@ function playVoice(buf) {
   src.onended = () => { activeSources = activeSources.filter((s) => s !== src); if (!activeSources.length) { speaking = false; setOrb("listening"); } };
   speaking = true; setOrb("speaking");
 }
-function stopVoice() {                                                     // barge-in
+function stopVoice(suppressRest) {                                         // barge-in
   activeSources.forEach((s) => { try { s.stop(); } catch {} });
-  activeSources = []; nextStart = 0; speaking = false; setOrb("listening");
+  activeSources = []; nextStart = 0; speaking = false;
+  if (suppressRest) { suppressTurn = true; armDrain(); }
+  setOrb(live ? "listening" : "idle");
+}
+
+// Safety net. Suppression normally ends at the server's turn_end; this makes sure a missing
+// turn_end can never leave the assistant permanently mute — once the tail stops arriving,
+// listening resumes.
+function armDrain() {
+  clearTimeout(drainTimer);
+  drainTimer = setTimeout(() => { suppressTurn = false; }, DRAIN_MS);
+}
+
+function resumeVoice() {
+  suppressTurn = false;
+  clearTimeout(drainTimer);
+  loudQuanta = 0;
 }
 
 // ---------- the live socket ----------
@@ -169,8 +196,8 @@ function connect() {
     else if (m.type === "products") renderProducts(m.items);
     else if (m.type === "requirements") renderRequirements(m.requirements);
     else if (m.type === "enquiry") renderEnquiry(m);
-    else if (m.type === "turn_end") endTurn();
-    else if (m.type === "interrupted") { endTurn(); stopVoice(); }
+    else if (m.type === "turn_end") { endTurn(); resumeVoice(); }
+    else if (m.type === "interrupted") { endTurn(); stopVoice(true); }
     else if (m.type === "error") { setStatus("error: " + m.message); console.error(m.message); }
   };
 }
@@ -185,7 +212,9 @@ async function startMic() {
   workletNode = new AudioWorkletNode(audioCtx, "pcm-processor");
   workletNode.port.onmessage = (e) => {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(e.data.pcm);       // 16k PCM up
-    if (e.data.rms >= BARGE_RMS && speaking) stopVoice();                  // client-side barge-in
+    // Sustained energy, not one loud sample — otherwise a click cuts the assistant off.
+    loudQuanta = e.data.rms >= BARGE_RMS ? loudQuanta + 1 : 0;
+    if (loudQuanta >= BARGE_SUSTAIN && speaking) { loudQuanta = 0; stopVoice(true); }
     if (e.data.rms >= VOICE_RMS) lastVoiceAt = Date.now();                 // someone is in the room
   };
   micSource.connect(workletNode);
@@ -205,7 +234,8 @@ function endCall(reason) {
   try { workletNode && workletNode.disconnect(); } catch {}
   try { audioCtx && audioCtx.close(); } catch {}
   ws = micStream = micSource = workletNode = audioCtx = null;
-  stopVoice();
+  stopVoice(false);
+  resumeVoice();
   endTurn();
   setOrb("idle");
   setStatus(reason);
