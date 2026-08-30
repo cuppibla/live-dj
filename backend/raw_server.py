@@ -1,4 +1,4 @@
-"""live-dj — the raw Gemini Live backend (EP1).
+"""MERCIL Voice Sales Agent — the raw Gemini Live backend.
 
 No framework. One Gemini Live session per browser, two asyncio tasks:
   - upstream:   browser mic (16k PCM)  -> session.send_realtime_input
@@ -7,7 +7,11 @@ No framework. One Gemini Live session per browser, two asyncio tasks:
 GOTCHA (the reason it dropped after one turn): session.receive() is a PER-TURN async
 generator — it ends when a turn completes. You must call it again in a loop for the next turn.
 
-Mira also CONTROLS MUSIC via function calling (tools.py), returning INSTANTLY so the voice never stalls.
+The consultant also CALLS SALES TOOLS (tools.py) — catalogue search, requirement capture, enquiry
+creation — returning INSTANTLY so the voice never stalls mid-sentence.
+
+Everything company-specific (persona, catalogue, rules) comes from config.py, which loads
+company-configs/<COMPANY_PROFILE>/. This file is the reusable engine.
 """
 import asyncio
 import json
@@ -24,11 +28,11 @@ from fastapi.staticfiles import StaticFiles
 from google import genai
 from google.genai import types
 
-from backend.persona import MIRA_INSTRUCTION
-from backend.tools import TOOL_DECLARATIONS, dispatch_tool
+from backend.config import CONFIG, SYSTEM_INSTRUCTION
+from backend.tools import TOOL_DECLARATIONS, dispatch_tool, reset_state
 
 logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("live-dj")
+log = logging.getLogger("voice-sales-agent")
 
 MODEL = os.getenv("LIVE_MODEL", "gemini-3.1-flash-live-preview")
 VOICE = os.getenv("LIVE_VOICE", "Aoede")
@@ -37,14 +41,14 @@ client = genai.Client()  # reads GOOGLE_API_KEY + GOOGLE_GENAI_USE_VERTEXAI=FALS
 
 LIVE_CONFIG = {
     "response_modalities": ["AUDIO"],
-    "system_instruction": MIRA_INSTRUCTION,
+    "system_instruction": SYSTEM_INSTRUCTION,
     "input_audio_transcription": {},
     "output_audio_transcription": {},
     "speech_config": {"voice_config": {"prebuilt_voice_config": {"voice_name": VOICE}}},
     "tools": [{"function_declarations": TOOL_DECLARATIONS}],
 }
 
-app = FastAPI(title="live-dj")
+app = FastAPI(title="MERCIL Voice Sales Agent")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 FRONTEND = Path(__file__).resolve().parents[1] / "frontend"
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
@@ -53,7 +57,9 @@ ASSETS = Path(__file__).resolve().parents[1] / "assets"
 @app.websocket("/ws")
 async def ws(websocket: WebSocket):
     await websocket.accept()
-    log.info("ws connected; opening Live session (model=%s, voice=%s)", MODEL, VOICE)
+    reset_state()   # a new browser session is a new customer
+    log.info("ws connected; profile=%s (%s); opening Live session (model=%s, voice=%s)",
+             CONFIG.profile, CONFIG.company_name, MODEL, VOICE)
     try:
         async with client.aio.live.connect(model=MODEL, config=LIVE_CONFIG) as session:
             log.info("Live session open")
@@ -77,9 +83,11 @@ async def ws(websocket: WebSocket):
                     ot = getattr(sc, "output_transcription", None)
                     mt = getattr(sc, "model_turn", None)
                     if it and getattr(it, "text", None):
-                        await websocket.send_text(json.dumps({"type": "transcript", "role": "user", "text": it.text}))
+                        await websocket.send_text(json.dumps(
+                            {"type": "transcript", "role": "user", "text": it.text}, ensure_ascii=False))
                     if ot and getattr(ot, "text", None):
-                        await websocket.send_text(json.dumps({"type": "transcript", "role": "mira", "text": ot.text}))
+                        await websocket.send_text(json.dumps(
+                            {"type": "transcript", "role": "agent", "text": ot.text}, ensure_ascii=False))
                     if mt and getattr(mt, "parts", None):
                         for part in mt.parts:
                             idata = getattr(part, "inline_data", None)
@@ -90,9 +98,9 @@ async def ws(websocket: WebSocket):
                 if tc:
                     results = []
                     for fc in tc.function_calls:
-                        cmd, result = dispatch_tool(fc.name, dict(getattr(fc, "args", None) or {}))
-                        if cmd:
-                            await websocket.send_text(json.dumps({"type": "play", **cmd}))
+                        events, result = dispatch_tool(fc.name, dict(getattr(fc, "args", None) or {}))
+                        for event in events:
+                            await websocket.send_text(json.dumps(event, ensure_ascii=False))
                         results.append(types.FunctionResponse(id=fc.id, name=fc.name, response=result))
                     await session.send_tool_response(function_responses=results)
 
@@ -141,6 +149,19 @@ async def ws(websocket: WebSocket):
         except Exception:
             pass
     log.info("ws closed")
+
+
+@app.get("/api/company")
+async def company():
+    """The browser reads its own branding from the active profile, so switching
+    COMPANY_PROFILE rebrands the UI without touching the frontend."""
+    return {
+        "product_name": "MERCIL Voice Sales Agent",
+        "company_name": CONFIG.company_name,
+        "assistant_role": CONFIG.assistant_role,
+        "language": CONFIG.language,
+        "profile": CONFIG.profile,
+    }
 
 
 if ASSETS.exists():

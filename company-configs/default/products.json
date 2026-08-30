@@ -1,0 +1,44 @@
+[
+  {
+    "id": "demo-generic-001",
+    "name": "Demo Consumable Supply",
+    "name_th": "สินค้าสิ้นเปลืองตัวอย่าง (ตัวอย่างสาธิต)",
+    "brand": "Approved brand",
+    "category": "consumable",
+    "customer_types": ["general"],
+    "use_cases": ["recurring monthly supply", "consumption control"],
+    "benefits": ["predictable recurring supply", "consumption sized during consultation"],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "demo-generic-002",
+    "name": "Demo Equipment Item",
+    "name_th": "อุปกรณ์ตัวอย่าง (ตัวอย่างสาธิต)",
+    "brand": "Approved brand",
+    "category": "equipment",
+    "customer_types": ["general"],
+    "use_cases": ["one-off capital purchase", "reducing manual labour"],
+    "benefits": ["replaces repetitive manual work", "specification confirmed with a specialist"],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  },
+  {
+    "id": "demo-generic-003",
+    "name": "Demo Service Package",
+    "name_th": "แพ็กเกจบริการตัวอย่าง (ตัวอย่างสาธิต)",
+    "brand": "Approved brand",
+    "category": "service",
+    "customer_types": ["general"],
+    "use_cases": ["ongoing support contract", "staff training"],
+    "benefits": ["ongoing support after purchase", "scope agreed with a specialist"],
+    "specifications": {},
+    "price_status": "contact_sales",
+    "availability_status": "confirmation_required",
+    "demo_only": true
+  }
+]

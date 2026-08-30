@@ -1,64 +1,142 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>live-dj · with mira</title>
+<title>MERCIL Voice Sales Agent</title>
 <style>
-  :root { --peach:#FFB89E; --lav:#A78BC9; --ink:#e8e0d4; }
+  :root {
+    --accent:#7FB3D5; --warm:#E8B87D; --ink:#e6e8ec; --dim:rgba(230,232,236,0.55);
+    --faint:rgba(230,232,236,0.28); --line:rgba(230,232,236,0.10);
+    --bg:#0d1014; --panel:rgba(255,255,255,0.025);
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0; min-height: 100vh; color: var(--ink);
-    font-family: ui-sans-serif, system-ui, Inter, sans-serif;
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Inter, "Noto Sans Thai", sans-serif;
     background:
-      radial-gradient(ellipse at 15% 5%, rgba(255,184,158,0.07) 0%, transparent 45%),
-      radial-gradient(ellipse at 85% 95%, rgba(167,139,201,0.07) 0%, transparent 45%),
-      #0f0b0a;
-    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      radial-gradient(ellipse at 12% 0%, rgba(127,179,213,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 88% 100%, rgba(232,184,125,0.05) 0%, transparent 50%),
+      var(--bg);
+    display: flex; flex-direction: column;
   }
-  .chrome { width: 100%; padding: 22px 28px; display: flex; justify-content: space-between;
-    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(232,224,212,0.25); }
-  .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; }
-  .orb { width: 260px; height: 260px; border-radius: 50%;
-    background: radial-gradient(circle at 38% 36%, rgba(255,245,235,0.95) 0%, var(--peach) 40%, var(--lav) 72%, transparent 100%);
+
+  /* ---- header ---- */
+  .chrome { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 20px 28px 16px; border-bottom: 1px solid var(--line); }
+  .brand { font-size: 15px; letter-spacing: 0.04em; font-weight: 600; }
+  .rep { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--faint); margin-top: 5px; }
+  .rep #company { color: var(--warm); }
+  .badge { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm);
+    border: 1px solid rgba(232,184,125,0.35); border-radius: 999px; padding: 5px 11px; white-space: nowrap; }
+
+  /* ---- layout ---- */
+  .wrap { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 0; }
+  .voice { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 24px 28px 32px; border-right: 1px solid var(--line); }
+  .panels { padding: 22px 28px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ---- orb ---- */
+  .orb { width: 190px; height: 190px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 38% 36%, rgba(245,250,255,0.95) 0%, var(--accent) 42%, rgba(90,120,160,0.5) 74%, transparent 100%);
     filter: blur(2px); opacity: 0.6; transition: opacity .3s; }
-  .orb.idle      { animation: breathe 4.5s ease-in-out infinite; opacity: 0.55; }
-  .orb.listening { animation: pulse 1.6s ease-in-out infinite; opacity: 0.7; }
-  .orb.thinking  { animation: none; opacity: 0.45; }
-  .orb.speaking  { animation: speak 2.8s ease-in-out infinite; opacity: 0.9; }
+  .orb.idle      { animation: breathe 4.5s ease-in-out infinite; opacity: 0.5; }
+  .orb.listening { animation: pulse 1.6s ease-in-out infinite; opacity: 0.72; }
+  .orb.thinking  { animation: none; opacity: 0.4; }
+  .orb.speaking  { animation: speak 2.8s ease-in-out infinite; opacity: 0.92; }
   @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-  @keyframes pulse   { 0%,100%{transform:scale(1.0);opacity:.55} 50%{transform:scale(1.07);opacity:.8} }
+  @keyframes pulse   { 0%,100%{transform:scale(1.0);opacity:.55} 50%{transform:scale(1.07);opacity:.85} }
   @keyframes speak   { 0%,100%{transform:scale(1.02);filter:blur(2px) brightness(1)} 50%{transform:scale(1.12);filter:blur(2px) brightness(1.25)} }
-  .status { font-style: italic; font-size: 14px; color: rgba(232,224,212,0.6); min-height: 20px; }
-  .info { width: 100%; padding: 18px 28px 28px;
-    background: linear-gradient(to top, rgba(15,11,10,0.9), transparent); text-align: center; }
-  .now { font-size: 12px; letter-spacing: 0.06em; color: rgba(232,224,212,0.55); min-height: 16px; }
-  .transcript { max-width: 520px; margin: 10px auto 0; max-height: 96px; overflow-y: auto;
-    font-size: 12px; line-height: 1.7; color: rgba(232,224,212,0.5); text-align: left; }
-  .line.mira { color: var(--peach); }
-  button { margin-top: 14px; background: transparent; color: var(--ink); border: 1px solid rgba(232,224,212,0.35);
-    border-radius: 999px; padding: 10px 22px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; }
-  button:hover { border-color: var(--peach); }
-  button:disabled { opacity: 0.7; }
-  .hint { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(232,224,212,0.22); margin-top: 12px; }
+
+  .status { font-size: 13px; color: var(--dim); min-height: 20px; text-align: center; }
+  button { background: transparent; color: var(--ink); border: 1px solid rgba(230,232,236,0.35);
+    border-radius: 999px; padding: 11px 26px; font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; cursor: pointer; font-family: inherit; }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: 0.7; cursor: default; }
+  .hint { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+
+  .transcript { width: 100%; max-width: 460px; max-height: 190px; overflow-y: auto;
+    font-size: 12.5px; line-height: 1.75; color: var(--dim); text-align: left;
+    border-top: 1px solid var(--line); padding-top: 14px; }
+  .line { margin-bottom: 2px; }
+  .line .who { color: var(--faint); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-right: 8px; }
+  .line.agent { color: var(--accent); }
+
+  /* ---- panels ---- */
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .panel h2 { margin: 0 0 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--faint); font-weight: 600; }
+  .empty { font-size: 12px; color: var(--faint); font-style: italic; }
+
+  .req { display: flex; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .req:last-child { border-bottom: none; }
+  .req .k { flex: 0 0 116px; color: var(--faint); font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; padding-top: 2px; }
+  .req .v { flex: 1; }
+
+  .card { border: 1px solid var(--line); border-left: 2px solid var(--accent); border-radius: 6px;
+    padding: 11px 13px; margin-bottom: 9px; background: rgba(255,255,255,0.02); }
+  .card:last-child { margin-bottom: 0; }
+  .card .name { font-size: 13.5px; font-weight: 600; }
+  .card .th { font-size: 12px; color: var(--dim); margin-top: 2px; }
+  .card .cat { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); margin-top: 6px; }
+  .card .why { font-size: 12px; color: var(--dim); margin-top: 7px; line-height: 1.55; }
+  .card .meta { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); margin-top: 8px; }
+
+  .enquiry { border-color: rgba(232,184,125,0.4); background: rgba(232,184,125,0.05); }
+  .enquiry .eid { font-size: 24px; letter-spacing: 0.06em; color: var(--warm); font-weight: 600; }
+  .enquiry .esum { font-size: 12.5px; color: var(--dim); margin-top: 9px; line-height: 1.6; }
+  .enquiry .meta { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--faint); margin-top: 11px; }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; }
+    .voice { border-right: none; border-bottom: 1px solid var(--line); }
+    .orb { width: 140px; height: 140px; }
+  }
 </style>
 </head>
 <body>
-  <div class="chrome"><span>live-dj</span><span>with mira</span><span>bedroom pop</span></div>
+  <header class="chrome">
+    <div>
+      <div class="brand">MERCIL Voice Sales Agent</div>
+      <div class="rep">Currently representing: <span id="company">…</span></div>
+    </div>
+    <span class="badge">Demonstration data</span>
+  </header>
 
-  <div class="stage">
-    <div id="orb" class="orb idle"></div>
-    <div id="status" class="status">tap the mic, then talk to mira</div>
+  <div class="wrap">
+    <div class="voice">
+      <div id="orb" class="orb idle"></div>
+      <div id="status" class="status">tap to start, then talk</div>
+      <button id="talk">🎙 start call</button>
+      <div class="hint">headphones on — or it hears itself</div>
+      <div id="transcript" class="transcript"></div>
+    </div>
+
+    <div class="panels">
+      <section class="panel">
+        <h2>Customer requirements</h2>
+        <div id="requirements"><div class="empty">— not yet captured —</div></div>
+      </section>
+      <section class="panel">
+        <h2>Recommended for this customer</h2>
+        <div id="products"><div class="empty">— recommendations appear as you talk —</div></div>
+      </section>
+      <section id="enquiry" class="panel enquiry" hidden>
+        <h2>Enquiry prepared</h2>
+        <div class="eid"></div>
+        <div class="esum"></div>
+        <div class="meta">Prepared for the sales team · demonstration only</div>
+      </section>
+    </div>
   </div>
 
-  <div class="info">
-    <div id="nowplaying" class="now"></div>
-    <div id="transcript" class="transcript"></div>
-    <button id="talk">🎙 talk</button>
-    <div class="hint">headphones on — or she hears her own radio</div>
-  </div>
-
-  <audio id="music" loop></audio>
   <script src="/main.js"></script>
 </body>
 </html>

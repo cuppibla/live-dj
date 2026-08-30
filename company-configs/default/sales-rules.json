@@ -1,0 +1,24 @@
+{
+  "company_name": "Demo Company",
+  "assistant_role": "Solutions sales consultant",
+  "language": "English",
+  "enquiry_prefix": "DEMO",
+  "customer_segments": ["general"],
+  "qualification_fields": [
+    "contact_name",
+    "company_name",
+    "phone",
+    "email_or_line",
+    "business_type",
+    "location",
+    "scale",
+    "priority",
+    "timeline"
+  ],
+  "safety_rules": [
+    "Never invent prices, availability, specifications, discounts, or certifications.",
+    "Recommend only products returned by the catalogue tools.",
+    "For technical specification questions, offer a human specialist."
+  ],
+  "handoff_line": "I can connect you with a specialist who will follow up directly."
+}

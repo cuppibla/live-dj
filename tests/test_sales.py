@@ -1,0 +1,129 @@
+import pytest
+
+from backend.config import CONFIG, load_config
+
+
+def test_kittichet_profile_loads():
+    cfg = load_config("kittichet")
+    assert cfg.company_name == "Kittichet SPR"
+    assert cfg.language == "Thai"
+    assert cfg.enquiry_prefix == "KT-POC"
+    assert len(cfg.products) >= 15
+
+
+def test_default_profile_is_not_kittichet():
+    cfg = load_config("default")
+    assert "Kittichet" not in cfg.company_name
+    assert cfg.products
+
+
+@pytest.mark.parametrize("profile", ["kittichet", "default"])
+def test_every_product_is_demo_labelled(profile):
+    for p in load_config(profile).products:
+        assert p["demo_only"] is True
+        assert p["price_status"] == "contact_sales"
+        assert p["availability_status"] == "confirmation_required"
+        assert set(p) >= {"id", "name", "category", "customer_types", "use_cases", "benefits"}
+
+
+def test_product_ids_are_unique():
+    ids = [p["id"] for p in load_config("kittichet").products]
+    assert len(ids) == len(set(ids))
+
+
+def test_system_instruction_carries_company_and_safety_rules():
+    from backend.config import SYSTEM_INSTRUCTION
+
+    assert CONFIG.company_name in SYSTEM_INSTRUCTION
+    assert "Thai" in SYSTEM_INSTRUCTION
+    for rule in CONFIG.rules["safety_rules"]:
+        assert rule in SYSTEM_INSTRUCTION
+    assert "confirmation" in SYSTEM_INSTRUCTION.lower()
+
+
+from backend import catalog, tools
+
+
+def test_search_matches_category():
+    hits = catalog.search(CONFIG.products, category="ice_machine")
+    assert hits and all(h["category"] == "ice_machine" for h in hits)
+
+
+def test_search_matches_free_text_in_name_or_use_case():
+    assert catalog.search(CONFIG.products, query="dispenser")
+    assert catalog.search(CONFIG.products, query="ไม่มีสินค้านี้แน่นอน") == []
+
+
+def test_search_filters_by_customer_type():
+    hits = catalog.search(CONFIG.products, customer_type="hotel")
+    assert hits and all("hotel" in h["customer_types"] for h in hits)
+
+
+def test_recommend_returns_reasons_and_matches_business_type():
+    recs = catalog.recommend(CONFIG.products, "hotel", ["washroom", "housekeeping"])
+    assert recs
+    assert all(r["why"] for r in recs)
+    assert all("hotel" in r["customer_types"] for r in recs)
+
+
+def test_recommend_unknown_business_type_still_returns_something():
+    assert catalog.recommend(CONFIG.products, "spaceport", ["cleaning"])
+
+
+def test_dispatch_search_emits_product_event():
+    events, result = tools.dispatch_tool("search_products", {"query": "glassware"})
+    assert result["count"] >= 1
+    assert events[0]["type"] == "products"
+    assert events[0]["items"]
+
+
+def test_capture_requirements_accumulates_across_calls():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"business_type": "hotel"})
+    events, result = tools.dispatch_tool("capture_requirements", {"scale": "80 rooms"})
+    reqs = events[0]["requirements"]
+    assert reqs["business_type"] == "hotel"
+    assert reqs["scale"] == "80 rooms"
+    assert result["result"] == "ok"
+
+
+def test_capture_requirements_ignores_empty_values():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"business_type": "hotel"})
+    events, _ = tools.dispatch_tool("capture_requirements", {"business_type": "", "location": None})
+    assert events[0]["requirements"]["business_type"] == "hotel"
+    assert "location" not in events[0]["requirements"]
+
+
+def test_enquiry_refuses_without_confirmation():
+    tools.reset_state()
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "80-room hotel", "confirmed": False})
+    assert events == []
+    assert result["result"] == "not_confirmed"
+
+
+def test_enquiry_creates_numbered_reference_when_confirmed():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"business_type": "hotel", "contact_name": "Khun A"})
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "80-room hotel in Khao Yai", "confirmed": True})
+    assert result["enquiry_id"] == f"{CONFIG.enquiry_prefix}-001"
+    assert events[0]["type"] == "enquiry"
+    assert events[0]["enquiry_id"] == f"{CONFIG.enquiry_prefix}-001"
+    assert events[0]["requirements"]["contact_name"] == "Khun A"
+
+
+def test_unknown_tool_is_not_fatal():
+    events, result = tools.dispatch_tool("play_playlist", {"mood": "dream pop"})
+    assert events == []
+    assert "unknown" in result["result"]
+
+
+def test_declarations_cover_every_dispatchable_tool():
+    names = {d["name"] for d in tools.TOOL_DECLARATIONS}
+    assert names == {"search_products", "recommend_products",
+                     "capture_requirements", "create_sales_enquiry"}
+    for d in tools.TOOL_DECLARATIONS:
+        assert d["parameters"]["type"] == "object"
+        assert d["description"]
