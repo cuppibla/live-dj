@@ -560,3 +560,94 @@ def test_brevity_is_bounded_so_the_assistant_does_not_go_terse():
     from backend.config import SYSTEM_INSTRUCTION
 
     assert "Being brief is not being unhelpful" in SYSTEM_INSTRUCTION
+
+
+# --- resolving what the customer agreed to, from what the assistant said out loud ---
+
+def test_resolve_handles_a_name_with_the_brand_appended():
+    """The assistant says the product the way it said it aloud, not the catalogue's exact
+    string. Requiring containment lost "the neutral floor cleaner from Ecolab"."""
+    p, confident = tools._resolve("น้ำยาถูพื้นสูตรเป็นกลางของ Ecolab")
+    assert p["id"] == "kt-floor-cleaner-neutral" and confident
+
+
+def test_resolve_asks_rather_than_guesses_on_a_loose_match():
+    """A customer's own wording lands close to the right product but not close enough to
+    act on: "สเปรย์ปรับอากาศแบบพ่นอัตโนมัติ" scores 0.317 and the washer-dryer we do NOT
+    sell scores 0.320. No threshold separates them, so a weak match becomes a question."""
+    p, confident = tools._resolve("สเปรย์ปรับอากาศแบบพ่นอัตโนมัติ")
+    assert p["id"] == "kt-air-freshener-dispenser"
+    assert not confident
+
+    p, confident = tools._resolve("automatic air freshener spray")
+    assert p["id"] == "kt-air-freshener-dispenser" and not confident
+
+
+def test_resolve_is_certain_about_exact_names_and_ids():
+    for token, pid in [("เครื่องขัดพื้นแบบเดินตาม", "kt-floor-scrubber-walkbehind"),
+                       ("Neutral Floor Cleaner", "kt-floor-cleaner-neutral"),
+                       ("kt-ice-machine-modular", "kt-ice-machine-modular"),
+                       ("เครื่องทำน้ำแข็ง", "kt-ice-machine-modular")]:
+        p, confident = tools._resolve(token)
+        assert p["id"] == pid and confident, token
+
+
+def test_resolve_returns_nothing_for_something_unrelated():
+    assert tools._resolve("a helicopter") == (None, False)
+    assert tools._resolve("รถยนต์ไฟฟ้า") == (None, False)
+
+
+def test_a_product_we_do_not_carry_is_never_silently_recorded():
+    """A washer-dryer scores as highly as a real product. It must not go on the list."""
+    tools.reset_state()
+    events, result = tools.dispatch_tool(
+        "record_customer_interest",
+        {"products": ["เครื่องซักผ้าอบแห้ง 20 กิโล"], "interest": "wanted"})
+    assert result["result"] == "needs_confirmation"
+    assert result["on_the_list"] == []
+    assert events == []
+
+
+def test_interest_reports_failure_instead_of_claiming_success():
+    """It answered "บันทึกไว้เรียบร้อยแล้ว" — recorded successfully — while recording
+    nothing at all. A tool that returns ok for a total failure will be believed."""
+    tools.reset_state()
+    events, result = tools.dispatch_tool(
+        "record_customer_interest", {"products": ["a helicopter"], "interest": "wanted"})
+    assert result["result"] == "not_found"
+    assert "not" in result["instruction"].lower()
+    assert events == []
+
+
+def test_interest_flags_a_partial_failure():
+    tools.reset_state()
+    _, result = tools.dispatch_tool(
+        "record_customer_interest",
+        {"products": ["Neutral Floor Cleaner", "a helicopter"], "interest": "wanted"})
+    assert result["result"] == "partial"
+    assert result["not_found"] == ["a helicopter"]
+
+
+def test_interest_returns_the_whole_list_so_the_summary_is_grounded():
+    """Its closing summary listed three products when only one had been recorded, because
+    it was summarising from memory. Every call now returns what is actually on the list."""
+    tools.reset_state()
+    tools.dispatch_tool("record_customer_interest",
+                        {"products": ["Neutral Floor Cleaner"], "interest": "wanted"})
+    _, result = tools.dispatch_tool(
+        "record_customer_interest",
+        {"products": ["Programmable Air Freshener Dispenser"], "interest": "wanted"})
+    assert set(result["on_the_list"]) == {"Neutral Floor Cleaner",
+                                          "Programmable Air Freshener Dispenser"}
+
+
+def test_the_products_from_the_failed_demo_reach_the_list():
+    """Two of these three silently vanished; only the floor scrubber made the panel."""
+    tools.reset_state()
+    _, result = tools.dispatch_tool("record_customer_interest", {
+        "products": ["น้ำยาถูพื้นสูตรเป็นกลางของ Ecolab",
+                     "เครื่องจ่ายน้ำหอมปรับอากาศ",
+                     "เครื่องขัดพื้นแบบเดินตาม"],
+        "interest": "wanted"})
+    assert result["result"] == "ok", result
+    assert len(result["on_the_list"]) == 3

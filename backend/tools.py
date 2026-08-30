@@ -7,6 +7,8 @@ the minimum (filter a list, update a dict) and returns INSTANTLY.
 Each returns (ui_events, result): the events go to the browser panels, the result goes
 back to the model.
 """
+import re
+
 from backend import catalog
 from backend.config import CONFIG
 
@@ -51,22 +53,68 @@ def _trim() -> None:
     _shortlist = keep
 
 
-def _find(token: str):
-    """Resolve one product from an id, an English name, or a Thai name.
+# Above STRONG we act; between MIN and STRONG we ask; below MIN we say we don't have it.
+# There is no threshold that separates a real match from a wrong one by score alone —
+# "สเปรย์ปรับอากาศแบบพ่นอัตโนมัติ" (a product we carry) scores 0.317 and
+# "เครื่องซักผ้าอบแห้ง" (one we do not) scores 0.320, because Thai compounds share
+# morphemes with everything. So a weak match becomes a question, not a guess.
+_MIN_SIMILARITY = 0.3
+_STRONG_SIMILARITY = 0.6
 
-    The assistant works from what it just said out loud, so it may pass a name rather
-    than an id it never had reason to keep.
+
+def _trigrams(text: str) -> set:
+    t = "".join((text or "").lower().split())
+    return {t[i:i + 3] for i in range(max(0, len(t) - 2))}
+
+
+def _similarity(a: str, b: str) -> float:
+    """Dice overlap on character trigrams.
+
+    Thai is written without spaces, so there is nothing to tokenise on and no stemming to
+    apply — comparing character runs is what actually works across "สเปรย์ปรับอากาศ"
+    and "เครื่องจ่ายน้ำหอมปรับอากาศ".
+    """
+    A, B = _trigrams(a), _trigrams(b)
+    if not A or not B:
+        return 0.0
+    return 2 * len(A & B) / (len(A) + len(B))
+
+
+def _resolve(token: str):
+    """Resolve however the assistant described a product aloud -> (product|None, confident).
+
+    This used to require the phrase to be a SUBSTRING of the catalogue name, so the
+    assistant only ever succeeded by quoting the catalogue back verbatim. Saying "the
+    neutral floor cleaner from Ecolab", or calling the programmable air freshener
+    dispenser an "automatic air freshener spray" the way the customer had, resolved to
+    nothing — and the customer was told it had been saved anyway.
     """
     t = (token or "").strip().lower()
     if not t:
-        return None
+        return None, False
     for p in CONFIG.products:
         if p["id"].lower() == t:
-            return p
+            return p, True
+    # Containment either way: the phrase may be longer than the catalogue name or shorter.
     for p in CONFIG.products:
-        if t in p["name"].lower() or (p.get("name_th") and t in p["name_th"].lower()):
-            return p
-    return None
+        for field in (p["name"], p.get("name_th") or ""):
+            f = field.lower()
+            if f and (t in f or f in t):
+                return p, True
+    best, best_score = None, 0.0
+    for p in CONFIG.products:
+        score = max(_similarity(t, p["name"]), _similarity(t, p.get("name_th") or ""))
+        if score > best_score:
+            best, best_score = p, score
+    if best is None or best_score < _MIN_SIMILARITY:
+        return None, False
+    # Character overlap alone is thin — "a helicopter" scores 0.296 against "Janitorial
+    # Cleaning Cart" on letter runs that mean nothing. Where the query has words to check,
+    # insist on a real shared word too. Thai has none, so similarity stands alone there.
+    words = set(re.findall(r"[a-z]{3,}", t)) - catalog._STOPWORDS
+    if words and not (words & set(re.findall(r"[a-z]{3,}", best["name"].lower()))):
+        return None, False
+    return best, best_score >= _STRONG_SIMILARITY
 
 
 def _remember(items: list, source: str) -> list:
@@ -242,10 +290,15 @@ def dispatch_tool(name: str, args: dict):
         interest = args.get("interest") or "wanted"
         if interest not in ("wanted", "declined"):
             interest = "wanted"
-        resolved, not_found = [], []
+        resolved, unsure, not_found = [], [], []
         for token in args.get("products") or []:
-            found = _find(token)
-            (resolved if found else not_found).append(found or token)
+            found, confident = _resolve(token)
+            if found and confident:
+                resolved.append(found)
+            elif found:
+                unsure.append((token, found))
+            else:
+                not_found.append(token)
         if resolved:
             # Put them on the panel if they aren't already, then mark them. A customer can
             # ask for something by name before it was ever recommended or searched.
@@ -255,9 +308,45 @@ def dispatch_tool(name: str, args: dict):
                 if entry["id"] in ids:
                     entry["interest"] = interest
             _trim()
-        return ([{"type": "products", "items": list(_shortlist)}],
-                {"result": "ok", interest: [p["name"] for p in resolved],
-                 "not_found": not_found})
+        on_the_list = [e["name"] for e in _shortlist if e.get("interest") == "wanted"]
+        ask = "; ".join(f'"{tok}" -> {p["name"]} ({p.get("name_th", "")})'
+                        for tok, p in unsure)
+        if not resolved and unsure:
+            # Recording the near-miss silently is how the wrong product would reach the
+            # sales team. Asking is what a salesperson does anyway.
+            return [], {"result": "needs_confirmation", "closest": ask,
+                        "on_the_list": on_the_list,
+                        "instruction": "NOT recorded yet — do not say it was saved. Ask the "
+                                       "customer to confirm you have the right product: "
+                                       + ask + ". If they say yes, call this again using "
+                                       "that exact catalogue name."}
+        if not resolved:
+            # Returning "ok" for a total failure got the customer told "บันทึกไว้เรียบร้อยแล้ว"
+            # — recorded successfully — while nothing had been recorded at all.
+            return [], {"result": "not_found", "not_found": not_found,
+                        "on_the_list": on_the_list,
+                        "instruction": "NOTHING was recorded — do not tell the customer it "
+                                       "was saved. Say you are not sure which product they "
+                                       "mean, name the closest ones from the catalogue, and "
+                                       "ask them to pick."}
+        out = {"result": "ok" if not not_found else "partial",
+               interest: [p["name"] for p in resolved],
+               "not_found": not_found,
+               # The whole list, every time. Its closing summary named three products when
+               # only one had been recorded, because it was summarising from memory.
+               "on_the_list": on_the_list}
+        notes = []
+        if not_found:
+            notes.append("NOT recorded, we do not appear to carry these: "
+                         + ", ".join(not_found))
+        if unsure:
+            notes.append("NOT recorded, confirm the product first: " + ask)
+        if notes:
+            out["result"] = "partial"
+            out["instruction"] = ("; ".join(notes)
+                                  + ". Tell the customer which ones did not go on before "
+                                    "you move on.")
+        return [{"type": "products", "items": list(_shortlist)}], out
 
     if name == "create_sales_enquiry":
         # A lead nobody can answer is not a lead. Checked BEFORE confirmation, so the

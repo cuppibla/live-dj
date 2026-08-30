@@ -104,7 +104,9 @@ def search(products: list, query: str = "", category: str = "", customer_type: s
     q = (query or "").strip().lower()
     cat = (category or "").strip().lower()
     ctype = (customer_type or "").strip().lower()
-    tokens = q.split()
+    # Same stopword filter as recommend(): without it "a helicopter" matched products on
+    # the word "a", and the interest resolver happily returned one of them.
+    tokens = _content_tokens(q)
     scored = []
     for p in products:
         if cat and p.get("category", "").lower() != cat:
