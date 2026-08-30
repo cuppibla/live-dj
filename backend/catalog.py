@@ -1,6 +1,21 @@
 """Pure catalogue lookups. No model, no I/O, no network — these run inside a live
 function call, and every millisecond here is a gap in the assistant's voice.
 """
+import re
+
+
+def _token_matches(token: str, hay: str) -> bool:
+    """Match a search token against a product's text.
+
+    Plain substring matching was quietly catastrophic: "ice" is inside "office",
+    "service" and "price", so searching for an ice machine returned tissue dispensers
+    and hand soap — and not the ice machine. ASCII tokens therefore have to start at a
+    word boundary. Thai is written without spaces, so Thai tokens keep substring
+    matching; there is no word boundary to anchor to.
+    """
+    if token.isascii():
+        return re.search(r"\b" + re.escape(token), hay) is not None
+    return token in hay
 
 
 def _haystack(p: dict) -> str:
@@ -14,16 +29,25 @@ def search(products: list, query: str = "", category: str = "", customer_type: s
     q = (query or "").strip().lower()
     cat = (category or "").strip().lower()
     ctype = (customer_type or "").strip().lower()
-    out = []
+    tokens = q.split()
+    scored = []
     for p in products:
         if cat and p.get("category", "").lower() != cat:
             continue
         if ctype and ctype not in [c.lower() for c in p.get("customer_types", [])]:
             continue
-        if q and not any(token in _haystack(p) for token in q.split()):
-            continue
-        out.append(p)
-    return out
+        hits = 0
+        if tokens:
+            hay = _haystack(p)
+            hits = sum(1 for t in tokens if _token_matches(t, hay))
+            if hits == 0:
+                continue
+        scored.append((hits, p))
+    # Rank by how many query tokens matched, so "ice machine" puts the ice machine first
+    # instead of burying it behind everything that merely matched "machine". Python's
+    # sort is stable, so equal scores keep catalogue order.
+    scored.sort(key=lambda s: -s[0])
+    return [p for _, p in scored]
 
 
 MAX_RECOMMENDATIONS = 4
@@ -95,7 +119,7 @@ def recommend(products: list, business_type: str, needs: list) -> list:
         types = [c.lower() for c in p.get("customer_types", [])]
         score = 2 if bt and bt in types else 0
         hay = _haystack(p)
-        matched = [n for n in needs if any(tok in hay for tok in n.split())]
+        matched = [n for n in needs if any(_token_matches(tok, hay) for tok in n.split())]
         score += len(matched)
         if score == 0:
             continue

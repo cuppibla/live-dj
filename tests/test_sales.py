@@ -198,3 +198,84 @@ def test_recommend_products_declaration_lists_the_real_segments():
     desc = d["parameters"]["properties"]["business_type"]["description"]
     for seg in CONFIG.rules["customer_segments"]:
         assert seg in desc
+
+
+# --- the shortlist: the panel must reflect the whole conversation, not the last tool call ---
+
+def test_shortlist_accumulates_across_calls():
+    """The agent carries the whole conversation; the panel used to show only the most
+    recent catalogue call, so one incidental lookup wiped the recommendations."""
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
+    names = [i["name"] for i in events[0]["items"]]
+    assert any("Ice Machine" in n for n in names)
+    assert any("Dispenser" in n or "Tissue" in n or "Towel" in n for n in names)
+
+
+def test_shortlist_puts_the_newest_batch_first():
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
+    assert "Ice Machine" in events[0]["items"][0]["name"]
+
+
+def test_shortlist_deduplicates_by_id():
+    tools.reset_state()
+    tools.dispatch_tool("search_products", {"query": "ice machine"})
+    events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
+    ids = [i["id"] for i in events[0]["items"]]
+    assert len(ids) == len(set(ids))
+
+
+def test_shortlist_marks_where_each_item_came_from():
+    """A card must never imply the assistant recommended something it merely looked up."""
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    events, _ = tools.dispatch_tool("search_products", {"query": "ice machine"})
+    by_name = {i["name"]: i["source"] for i in events[0]["items"]}
+    assert by_name["Demo Modular Ice Machine"] == "looked_up"
+    assert "recommended" in by_name.values()
+
+
+def test_shortlist_is_capped():
+    tools.reset_state()
+    for q in ["dispenser", "tissue", "towel", "cleaner", "floor", "glass"]:
+        events, _ = tools.dispatch_tool("search_products", {"query": q})
+    assert len(events[0]["items"]) <= tools.MAX_SHORTLIST
+
+
+def test_shortlist_resets_with_the_session():
+    tools.dispatch_tool("search_products", {"query": "ice machine"})
+    tools.reset_state()
+    events, _ = tools.dispatch_tool("capture_requirements", {"business_type": "hotel"})
+    assert events[0]["type"] == "requirements"
+    events, _ = tools.dispatch_tool("search_products", {"query": "glassware"})
+    assert all("Glassware" in i["name"] for i in events[0]["items"])
+
+
+def test_enquiry_carries_the_products_actually_discussed():
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel washrooms", "confirmed": True})
+    assert result["products_discussed"]
+    assert events[0]["products_discussed"][0]["name"]
+
+
+def test_search_does_not_match_a_token_inside_another_word():
+    """"ice" is inside "office", "service" and "price". Searching for an ice machine
+    returned tissue dispensers and hand soap, with the ice machine nowhere in sight."""
+    hits = catalog.search(CONFIG.products, query="ice machine")
+    assert hits[0]["category"] == "ice_machine"
+    assert not any(h["category"] in ("toilet_tissue", "hand_hygiene") for h in hits)
+
+
+def test_search_ranks_by_how_many_tokens_matched():
+    hits = catalog.search(CONFIG.products, query="ice machine")
+    assert "Ice Machine" in hits[0]["name"]
+
+
+def test_search_still_matches_word_prefixes():
+    assert catalog.search(CONFIG.products, query="dispens")
+    assert catalog.search(CONFIG.products, query="clean")

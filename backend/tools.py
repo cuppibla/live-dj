@@ -16,15 +16,40 @@ _REQUIREMENT_FIELDS = [
     "business_type", "location", "scale", "priority", "timeline", "notes",
 ]
 
+# How many products the panel carries. The customer is looking at this while they talk,
+# so it is a shortlist, not a catalogue dump.
+MAX_SHORTLIST = 8
+
 _requirements: dict = {}
+_shortlist: list = []
 _enquiry_count = 0
 
 
 def reset_state() -> None:
     """Fresh conversation — a new browser session starts from an empty sheet."""
-    global _requirements, _enquiry_count
+    global _requirements, _shortlist, _enquiry_count
     _requirements = {}
+    _shortlist = []
     _enquiry_count = 0
+
+
+def _remember(items: list, source: str) -> list:
+    """Add a batch to the running shortlist and return the whole thing, newest first.
+
+    The panel has to survive the whole conversation. Emitting only the latest tool call
+    meant one incidental lookup ("do you have ice machines?") wiped the recommendations
+    built up over the previous five minutes — the assistant still remembered them, the
+    screen didn't, and the customer saw the screen.
+
+    `source` is carried per item so a card never implies the assistant recommended
+    something it merely looked up.
+    """
+    global _shortlist
+    ids = {i["id"] for i in items}
+    kept = [e for e in _shortlist if e["id"] not in ids]
+    _shortlist = [{**i, "source": source} for i in items] + kept
+    del _shortlist[MAX_SHORTLIST:]
+    return list(_shortlist)
 
 
 def _slim(p: dict) -> dict:
@@ -116,8 +141,8 @@ def dispatch_tool(name: str, args: dict):
             query=args.get("query", ""),
             category=args.get("category", ""),
             customer_type=args.get("customer_type", ""),
-        )][:8]
-        events = [{"type": "products", "items": hits}] if hits else []
+        )][:catalog.MAX_RECOMMENDATIONS]
+        events = [{"type": "products", "items": _remember(hits, "looked_up")}] if hits else []
         return events, {"count": len(hits), "products": hits,
                         "note": "demonstration catalogue data; price and availability require a human"}
 
@@ -136,7 +161,7 @@ def dispatch_tool(name: str, args: dict):
                     f"general-purpose options, not chosen for that industry — tell the "
                     f"customer plainly and offer a specialist. Configured segments: "
                     f"{', '.join(CONFIG.rules['customer_segments'])}.")
-        return [{"type": "products", "items": hits}], {
+        return [{"type": "products", "items": _remember(hits, "recommended")}], {
             "count": len(hits), "recommendations": hits,
             "segment_in_catalogue": covered, "note": note}
 
@@ -160,6 +185,9 @@ def dispatch_tool(name: str, args: dict):
             "company": CONFIG.company_name,
             "summary": args.get("summary", ""),
             "requirements": dict(_requirements),
+            "products_discussed": [{"id": p["id"], "name": p["name"],
+                                    "category": p["category"], "source": p["source"]}
+                                   for p in _shortlist],
             "status": "prepared_for_sales_team",
             "demo_only": True,
         }

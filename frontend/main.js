@@ -69,9 +69,13 @@ function renderProducts(items) {
       d.className = cls; d.textContent = text;
       card.appendChild(d);
     });
+    // A looked-up product is not a recommendation. Saying so on the card keeps the panel
+    // honest when the assistant checked the catalogue without proposing anything.
+    if (p.source === "looked_up") card.classList.add("lookup");
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = "Price: contact sales · Availability: to confirm · demo data";
+    meta.textContent = (p.source === "looked_up" ? "Looked up · " : "")
+      + "Price: contact sales · Availability: to confirm · demo data";
     card.appendChild(meta);
     prodEl.appendChild(card);
   });
