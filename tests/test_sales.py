@@ -127,3 +127,74 @@ def test_declarations_cover_every_dispatchable_tool():
     for d in tools.TOOL_DECLARATIONS:
         assert d["parameters"]["type"] == "object"
         assert d["description"]
+
+
+# --- grounding fixes: the "why" line must never assert the caller's guess as fact ---
+
+def test_recommend_never_asserts_the_callers_business_type():
+    """The model must map an unlisted business onto some segment to search at all.
+    Echoing that guess back as 'suited to <x> operations' shows the customer a claim
+    about their own business that nobody made. Regression: a pharmacy was told every
+    product was 'suited to office operations'."""
+    recs = catalog.recommend(CONFIG.products, "office", ["hand hygiene"])
+    for r in recs:
+        assert "suited to office operations" not in r["why"]
+        assert "office operations" not in r["why"]
+
+
+def test_why_is_grounded_in_the_products_own_catalogue_entry():
+    recs = catalog.recommend(CONFIG.products, "hotel", ["washroom"])
+    for r in recs:
+        assert "catalogue lists it for" in r["why"]
+        # every segment named in the reason is genuinely on the product record
+        named = r["why"].split("catalogue lists it for ")[1].split(" — ")[0]
+        for seg in named.split(", "):
+            assert seg in r["customer_types"]
+
+
+def test_segment_covered_reports_catalogue_reality():
+    assert catalog.segment_covered(CONFIG.products, "hotel") is True
+    assert catalog.segment_covered(CONFIG.products, "spaceport") is False
+    assert catalog.segment_covered(CONFIG.products, "") is False
+
+
+def test_pharmacy_is_a_covered_segment():
+    """A pharmacy walked into the demo and the catalogue had nowhere to put it."""
+    assert catalog.segment_covered(CONFIG.products, "pharmacy") is True
+    assert "pharmacy" in CONFIG.rules["customer_segments"]
+
+
+def test_dispatch_recommend_flags_an_uncovered_segment_instead_of_substituting():
+    events, result = tools.dispatch_tool(
+        "recommend_products", {"business_type": "spaceport", "needs": ["cleaning"]})
+    assert result["segment_in_catalogue"] is False
+    assert "spaceport" in result["note"]
+    assert result["recommendations"]
+
+
+def test_dispatch_recommend_confirms_a_covered_segment():
+    _, result = tools.dispatch_tool(
+        "recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    assert result["segment_in_catalogue"] is True
+
+
+def test_recommend_returns_a_consultative_number_of_cards():
+    """Eight cards is a wall of product, not a consultation."""
+    recs = catalog.recommend(CONFIG.products, "hotel", ["washroom", "cleaning", "restaurant"])
+    assert len(recs) <= 4
+
+
+def test_capture_requirements_corrects_a_wrong_value():
+    """An early mis-hear must be fixable — the panel showed 'ร้านอาหาร' for a pharmacy
+    long after the assistant had understood otherwise."""
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"business_type": "ร้านอาหาร"})
+    events, _ = tools.dispatch_tool("capture_requirements", {"business_type": "ร้านขายยา"})
+    assert events[0]["requirements"]["business_type"] == "ร้านขายยา"
+
+
+def test_recommend_products_declaration_lists_the_real_segments():
+    d = next(d for d in tools.TOOL_DECLARATIONS if d["name"] == "recommend_products")
+    desc = d["parameters"]["properties"]["business_type"]["description"]
+    for seg in CONFIG.rules["customer_segments"]:
+        assert seg in desc

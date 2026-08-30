@@ -3,7 +3,16 @@
   "assistant_role": "Hygiene and facility sales consultant",
   "language": "Thai",
   "enquiry_prefix": "KT-POC",
-  "customer_segments": ["hotel", "restaurant", "hospital", "factory", "office"],
+  "customer_segments": [
+    "hotel",
+    "restaurant",
+    "hospital",
+    "clinic",
+    "pharmacy",
+    "retail",
+    "factory",
+    "office"
+  ],
   "qualification_fields": [
     "contact_name",
     "company_name",

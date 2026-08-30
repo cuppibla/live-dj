@@ -98,7 +98,13 @@ async def ws(websocket: WebSocket):
                 if tc:
                     results = []
                     for fc in tc.function_calls:
-                        events, result = dispatch_tool(fc.name, dict(getattr(fc, "args", None) or {}))
+                        args = dict(getattr(fc, "args", None) or {})
+                        events, result = dispatch_tool(fc.name, args)
+                        # Log every call: when the screen disagrees with the conversation,
+                        # this is the only place the truth is written down.
+                        log.info("tool %s(%s) -> %s", fc.name, args,
+                                 {k: v for k, v in result.items()
+                                  if k not in ("products", "recommendations")})
                         for event in events:
                             await websocket.send_text(json.dumps(event, ensure_ascii=False))
                         results.append(types.FunctionResponse(id=fc.id, name=fc.name, response=result))

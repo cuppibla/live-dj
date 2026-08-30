@@ -5,9 +5,25 @@
     "name_th": "เครื่องจ่ายกระดาษทิชชูแบบควบคุมปริมาณ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "washroom_dispenser",
-    "customer_types": ["hotel", "restaurant", "office", "hospital"],
-    "use_cases": ["high-traffic washroom", "consumption control", "guest-facing washroom"],
-    "benefits": ["controlled dispensing reduces tissue waste", "consistent premium appearance", "fewer refill rounds for housekeeping"],
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "office",
+      "hospital",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "high-traffic washroom",
+      "consumption control",
+      "guest-facing washroom"
+    ],
+    "benefits": [
+      "controlled dispensing reduces tissue waste",
+      "consistent premium appearance",
+      "fewer refill rounds for housekeeping"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -19,9 +35,24 @@
     "name_th": "เครื่องจ่ายกระดาษชำระม้วนใหญ่ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "washroom_dispenser",
-    "customer_types": ["factory", "office", "hospital"],
-    "use_cases": ["very high traffic washroom", "low maintenance staff washroom", "large site with few housekeeping rounds"],
-    "benefits": ["long refill interval", "lower cost per user", "simple for staff to service"],
+    "customer_types": [
+      "factory",
+      "office",
+      "hospital",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "very high traffic washroom",
+      "low maintenance staff washroom",
+      "large site with few housekeeping rounds"
+    ],
+    "benefits": [
+      "long refill interval",
+      "lower cost per user",
+      "simple for staff to service"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -33,9 +64,24 @@
     "name_th": "เครื่องจ่ายกระดาษเช็ดมือแบบเซ็นเซอร์ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "washroom_dispenser",
-    "customer_types": ["hotel", "hospital", "office"],
-    "use_cases": ["touch-free washroom", "infection-control area", "premium guest washroom"],
-    "benefits": ["no contact with the dispenser surface", "controlled sheet-by-sheet dispensing", "modern washroom appearance"],
+    "customer_types": [
+      "hotel",
+      "hospital",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "touch-free washroom",
+      "infection-control area",
+      "premium guest washroom"
+    ],
+    "benefits": [
+      "no contact with the dispenser surface",
+      "controlled sheet-by-sheet dispensing",
+      "modern washroom appearance"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -47,9 +93,23 @@
     "name_th": "กระดาษชำระเกรดพรีเมียม (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "toilet_tissue",
-    "customer_types": ["hotel", "restaurant", "office"],
-    "use_cases": ["guest room", "guest-facing washroom", "restaurant washroom"],
-    "benefits": ["soft feel appropriate to guest expectations", "consistent presentation in the room"],
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "guest room",
+      "guest-facing washroom",
+      "restaurant washroom"
+    ],
+    "benefits": [
+      "soft feel appropriate to guest expectations",
+      "consistent presentation in the room"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -61,9 +121,24 @@
     "name_th": "กระดาษชำระม้วนใหญ่ปริมาณสูง (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "toilet_tissue",
-    "customer_types": ["factory", "office", "hospital"],
-    "use_cases": ["staff washroom", "high consumption site", "consumption control"],
-    "benefits": ["fewer changes per week", "lower cost per user", "pairs with the jumbo roll dispenser"],
+    "customer_types": [
+      "factory",
+      "office",
+      "hospital",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "staff washroom",
+      "high consumption site",
+      "consumption control"
+    ],
+    "benefits": [
+      "fewer changes per week",
+      "lower cost per user",
+      "pairs with the jumbo roll dispenser"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -75,9 +150,24 @@
     "name_th": "กระดาษเช็ดมือแบบแผ่นสอด (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "paper_towel",
-    "customer_types": ["hotel", "restaurant", "hospital", "office"],
-    "use_cases": ["public washroom", "kitchen hand drying", "infection-control area"],
-    "benefits": ["one sheet at a time reduces usage", "hygienic single-sheet handling"],
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "public washroom",
+      "kitchen hand drying",
+      "infection-control area"
+    ],
+    "benefits": [
+      "one sheet at a time reduces usage",
+      "hygienic single-sheet handling"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -89,9 +179,22 @@
     "name_th": "กระดาษเช็ดมือแบบม้วน (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "paper_towel",
-    "customer_types": ["factory", "office"],
-    "use_cases": ["high traffic washroom", "workshop hand drying", "low maintenance site"],
-    "benefits": ["long refill interval", "suits continuous shift usage"],
+    "customer_types": [
+      "factory",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "high traffic washroom",
+      "workshop hand drying",
+      "low maintenance site"
+    ],
+    "benefits": [
+      "long refill interval",
+      "suits continuous shift usage"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -103,9 +206,24 @@
     "name_th": "สบู่ล้างมือชนิดโฟม (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "hand_hygiene",
-    "customer_types": ["hotel", "restaurant", "hospital", "office"],
-    "use_cases": ["public washroom", "guest room", "kitchen hand hygiene"],
-    "benefits": ["foam format uses less product per wash", "gentle enough for frequent washing"],
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "hospital",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "public washroom",
+      "guest room",
+      "kitchen hand hygiene"
+    ],
+    "benefits": [
+      "foam format uses less product per wash",
+      "gentle enough for frequent washing"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -117,9 +235,25 @@
     "name_th": "เจลแอลกอฮอล์ทำความสะอาดมือ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "hand_hygiene",
-    "customer_types": ["hospital", "hotel", "factory", "office"],
-    "use_cases": ["lobby and entrance point", "infection-control area", "food handling area", "meeting room"],
-    "benefits": ["hand hygiene away from a washbasin", "visible reassurance for guests and staff"],
+    "customer_types": [
+      "hospital",
+      "hotel",
+      "factory",
+      "office",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "lobby and entrance point",
+      "infection-control area",
+      "food handling area",
+      "meeting room"
+    ],
+    "benefits": [
+      "hand hygiene away from a washbasin",
+      "visible reassurance for guests and staff"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -131,9 +265,26 @@
     "name_th": "น้ำยาทำความสะอาดอเนกประสงค์ชนิดเข้มข้น (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "cleaning_chemical",
-    "customer_types": ["hotel", "restaurant", "office", "factory"],
-    "use_cases": ["guest room housekeeping", "public area cleaning", "daily surface cleaning", "housekeeping trolley kit"],
-    "benefits": ["one product covers most daily surfaces", "concentrate reduces storage space", "simpler training for housekeeping staff"],
+    "customer_types": [
+      "hotel",
+      "restaurant",
+      "office",
+      "factory",
+      "pharmacy",
+      "retail",
+      "clinic"
+    ],
+    "use_cases": [
+      "guest room housekeeping",
+      "public area cleaning",
+      "daily surface cleaning",
+      "housekeeping trolley kit"
+    ],
+    "benefits": [
+      "one product covers most daily surfaces",
+      "concentrate reduces storage space",
+      "simpler training for housekeeping staff"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -145,9 +296,21 @@
     "name_th": "น้ำยาขจัดคราบไขมันสำหรับครัว (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "degreaser",
-    "customer_types": ["restaurant", "hotel", "factory"],
-    "use_cases": ["commercial kitchen", "hood and range cleaning", "back-of-house floor", "food production area"],
-    "benefits": ["designed for heavy cooking soil", "reduces manual scrubbing time"],
+    "customer_types": [
+      "restaurant",
+      "hotel",
+      "factory"
+    ],
+    "use_cases": [
+      "commercial kitchen",
+      "hood and range cleaning",
+      "back-of-house floor",
+      "food production area"
+    ],
+    "benefits": [
+      "designed for heavy cooking soil",
+      "reduces manual scrubbing time"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -159,9 +322,23 @@
     "name_th": "กลุ่มผลิตภัณฑ์ฆ่าเชื้อบนพื้นผิว (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "disinfectant",
-    "customer_types": ["hospital", "hotel", "restaurant"],
-    "use_cases": ["infection-control area", "high-touch surface", "food contact area", "guest room turnover"],
-    "benefits": ["category selected with a specialist to match your protocol", "supports a documented cleaning routine"],
+    "customer_types": [
+      "hospital",
+      "hotel",
+      "restaurant",
+      "pharmacy",
+      "clinic"
+    ],
+    "use_cases": [
+      "infection-control area",
+      "high-touch surface",
+      "food contact area",
+      "guest room turnover"
+    ],
+    "benefits": [
+      "category selected with a specialist to match your protocol",
+      "supports a documented cleaning routine"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -173,9 +350,23 @@
     "name_th": "ชุดแผ่นขัดพื้น (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "floor_care",
-    "customer_types": ["hotel", "factory", "office", "hospital"],
-    "use_cases": ["hard floor maintenance", "lobby and corridor", "periodic deep clean"],
-    "benefits": ["pad grade matched to your floor type during consultation", "consistent finish across public areas"],
+    "customer_types": [
+      "hotel",
+      "factory",
+      "office",
+      "hospital",
+      "retail",
+      "pharmacy"
+    ],
+    "use_cases": [
+      "hard floor maintenance",
+      "lobby and corridor",
+      "periodic deep clean"
+    ],
+    "benefits": [
+      "pad grade matched to your floor type during consultation",
+      "consistent finish across public areas"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -187,9 +378,22 @@
     "name_th": "เครื่องขัดพื้นแบบจานเดี่ยว (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "floor_equipment",
-    "customer_types": ["hotel", "factory", "office"],
-    "use_cases": ["large hard floor area", "lobby and corridor", "periodic deep clean", "reducing manual labour"],
-    "benefits": ["covers large areas faster than manual cleaning", "one machine serves scrubbing and polishing tasks"],
+    "customer_types": [
+      "hotel",
+      "factory",
+      "office",
+      "retail"
+    ],
+    "use_cases": [
+      "large hard floor area",
+      "lobby and corridor",
+      "periodic deep clean",
+      "reducing manual labour"
+    ],
+    "benefits": [
+      "covers large areas faster than manual cleaning",
+      "one machine serves scrubbing and polishing tasks"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -201,9 +405,21 @@
     "name_th": "รถเข็นแม่บ้าน (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "floor_equipment",
-    "customer_types": ["hotel", "hospital"],
-    "use_cases": ["guest room housekeeping", "room turnover round", "linen and amenity transport"],
-    "benefits": ["one trip per corridor instead of several", "keeps chemicals and amenities organised", "tidier presentation in guest corridors"],
+    "customer_types": [
+      "hotel",
+      "hospital",
+      "retail"
+    ],
+    "use_cases": [
+      "guest room housekeeping",
+      "room turnover round",
+      "linen and amenity transport"
+    ],
+    "benefits": [
+      "one trip per corridor instead of several",
+      "keeps chemicals and amenities organised",
+      "tidier presentation in guest corridors"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -215,9 +431,20 @@
     "name_th": "กลุ่มแก้วสำหรับร้านอาหาร (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "glassware",
-    "customer_types": ["hotel", "restaurant"],
-    "use_cases": ["restaurant service", "bar service", "banquet and meeting room", "breakfast service"],
-    "benefits": ["consistent look across the restaurant", "range sized to your service style during consultation"],
+    "customer_types": [
+      "hotel",
+      "restaurant"
+    ],
+    "use_cases": [
+      "restaurant service",
+      "bar service",
+      "banquet and meeting room",
+      "breakfast service"
+    ],
+    "benefits": [
+      "consistent look across the restaurant",
+      "range sized to your service style during consultation"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -229,9 +456,20 @@
     "name_th": "บรรจุภัณฑ์อาหารย่อยสลายได้ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "food_packaging",
-    "customer_types": ["restaurant", "hotel"],
-    "use_cases": ["takeaway service", "room service", "event and banquet catering", "sustainability programme"],
-    "benefits": ["supports an environmental positioning you can show guests", "replaces single-use plastic in takeaway service"],
+    "customer_types": [
+      "restaurant",
+      "hotel"
+    ],
+    "use_cases": [
+      "takeaway service",
+      "room service",
+      "event and banquet catering",
+      "sustainability programme"
+    ],
+    "benefits": [
+      "supports an environmental positioning you can show guests",
+      "replaces single-use plastic in takeaway service"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",
@@ -243,9 +481,20 @@
     "name_th": "เครื่องผลิตน้ำแข็งแบบโมดูลาร์ (ตัวอย่างสาธิต)",
     "brand": "Approved brand",
     "category": "ice_machine",
-    "customer_types": ["hotel", "restaurant"],
-    "use_cases": ["hotel beverage service", "restaurant bar", "banquet operations", "guest floor ice station"],
-    "benefits": ["continuous ice supply for food service", "capacity sized to daily consumption during consultation"],
+    "customer_types": [
+      "hotel",
+      "restaurant"
+    ],
+    "use_cases": [
+      "hotel beverage service",
+      "restaurant bar",
+      "banquet operations",
+      "guest floor ice station"
+    ],
+    "benefits": [
+      "continuous ice supply for food service",
+      "capacity sized to daily consumption during consultation"
+    ],
     "specifications": {},
     "price_status": "contact_sales",
     "availability_status": "confirmation_required",

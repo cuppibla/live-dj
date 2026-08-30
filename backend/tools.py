@@ -64,7 +64,13 @@ TOOL_DECLARATIONS = [
         "parameters": {
             "type": "object",
             "properties": {
-                "business_type": {"type": "string", "description": "hotel, restaurant, hospital, factory, office, ..."},
+                "business_type": {"type": "string", "description": (
+                    "The customer's business. Configured segments: "
+                    + ", ".join(CONFIG.rules["customer_segments"])
+                    + ". If the customer's business is not one of these, pass their own "
+                      "words rather than forcing it into the closest segment — the result "
+                      "tells you whether the catalogue covers it, and an honest 'we don't "
+                      "have products specific to that' beats a confident wrong answer.")},
                 "needs": {"type": "array", "items": {"type": "string"},
                           "description": "the needs the customer has stated so far"},
             },
@@ -116,11 +122,23 @@ def dispatch_tool(name: str, args: dict):
                         "note": "demonstration catalogue data; price and availability require a human"}
 
     if name == "recommend_products":
+        business_type = args.get("business_type", "")
         hits = [_slim(p) for p in catalog.recommend(
-            CONFIG.products, args.get("business_type", ""), args.get("needs") or [])]
+            CONFIG.products, business_type, args.get("needs") or [])]
+        covered = catalog.segment_covered(CONFIG.products, business_type)
+        if covered:
+            note = "explain why each fits what the customer told you"
+        else:
+            # Say so rather than letting the customer assume these were chosen for their
+            # industry. Silently substituting the nearest segment is how a pharmacy ended
+            # up being shown products picked for offices.
+            note = (f"The catalogue does not cover '{business_type}'. These are "
+                    f"general-purpose options, not chosen for that industry — tell the "
+                    f"customer plainly and offer a specialist. Configured segments: "
+                    f"{', '.join(CONFIG.rules['customer_segments'])}.")
         return [{"type": "products", "items": hits}], {
             "count": len(hits), "recommendations": hits,
-            "note": "explain why each fits what the customer told you"}
+            "segment_in_catalogue": covered, "note": note}
 
     if name == "capture_requirements":
         for field in _REQUIREMENT_FIELDS:

@@ -26,6 +26,54 @@ def search(products: list, query: str = "", category: str = "", customer_type: s
     return out
 
 
+MAX_RECOMMENDATIONS = 4
+
+
+def segment_covered(products: list, business_type: str) -> bool:
+    """Does the catalogue actually serve this segment? The assistant needs to know,
+    because the honest answer to an uncovered segment is to say so — not to quietly
+    recommend the nearest thing and let the customer assume it was chosen for them.
+    """
+    bt = (business_type or "").strip().lower()
+    if not bt:
+        return False
+    return any(bt in [c.lower() for c in p.get("customer_types", [])] for p in products)
+
+
+def _listed_for(p: dict, bt: str) -> list:
+    """The segments to name, caller's own first — but ONLY when the record really lists it.
+
+    Truncating to three otherwise hid the customer's own segment behind three others: a
+    pharmacy read "listed for hotel, hospital, office" about a product that does serve
+    pharmacies, and reasonably concluded it wasn't meant for them.
+    """
+    types = p.get("customer_types", [])
+    if bt and bt in [c.lower() for c in types]:
+        first = [c for c in types if c.lower() == bt]
+        return first + [c for c in types if c.lower() != bt][:2]
+    return types[:3]
+
+
+def _why(p: dict, matched: list, bt: str = "") -> str:
+    """Build the spoken reason from the product's OWN catalogue entry.
+
+    It must never repeat the caller's business_type back as an assertion. The model has
+    to map an unlisted business onto some segment just to search, and echoing that guess
+    produced the demo's worst moment: a pharmacy told that every product was "suited to
+    office operations" — a claim about the customer's business that nobody had made.
+    What the catalogue lists is true regardless of how the model mapped the customer.
+    """
+    reasons = []
+    if matched:
+        reasons.append("matches the stated need for " + ", ".join(matched))
+    listed = _listed_for(p, bt)
+    if listed:
+        reasons.append("catalogue lists it for " + ", ".join(listed))
+    if p.get("benefits"):
+        reasons.append("; ".join(p["benefits"][:2]))
+    return " — ".join(reasons)
+
+
 def recommend(products: list, business_type: str, needs: list) -> list:
     """Rank by how well a product serves this business type and these stated needs.
 
@@ -51,19 +99,12 @@ def recommend(products: list, business_type: str, needs: list) -> list:
         score += len(matched)
         if score == 0:
             continue
-        reasons = []
-        if bt and bt in types:
-            reasons.append(f"suited to {business_type} operations")
-        if matched:
-            reasons.append("matches the stated need for " + ", ".join(matched))
-        if p.get("benefits"):
-            reasons.append("; ".join(p["benefits"][:2]))
-        scored.append((score, {**p, "why": " — ".join(reasons)}))
+        scored.append((score, {**p, "why": _why(p, matched, bt)}))
     scored.sort(key=lambda s: -s[0])
-    hits = [p for _, p in scored[:8]]
+    hits = [p for _, p in scored[:MAX_RECOMMENDATIONS]]
     if hits:
         return hits
     # Nothing matched: fall back to the broadest entries rather than returning
     # nothing, so the assistant always has grounded data instead of improvising.
-    return [{**p, "why": "general-purpose option — needs confirmation with a specialist"}
+    return [{**p, "why": _why(p, [], bt) + " — general-purpose option, confirm with a specialist"}
             for p in pool[:3]]
