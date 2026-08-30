@@ -136,6 +136,11 @@ model simply never hears you.
   until the tool returns, so every handler does list filtering and nothing else.
 - The model is **audio-only**; `response_modalities: ["TEXT"]` is rejected by
   `gemini-3.1-flash-live-preview`.
+- **Transcript language cannot be pinned on the Developer API.** Each profile declares
+  `transcription_languages`, but `language_codes` is Vertex/Enterprise only and the Developer API
+  rejects it at session open, so it is dropped there with a warning. Transcription is
+  auto-detected and short utterances can come back as the wrong language; the model still
+  understands the speech, only the displayed transcript is affected.
 - **Cost.** Live sessions bill continuously on streamed audio, so the controls that matter are
   hanging up and not leaving the tab open — not the model choice, which is already the Flash tier.
   Context also accumulates server-side for the life of a session, so `context_window_compression`

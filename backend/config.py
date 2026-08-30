@@ -17,6 +17,7 @@ class CompanyConfig:
     company_name: str
     assistant_role: str
     language: str
+    transcription_languages: list
     enquiry_prefix: str
     persona: str
     products: list
@@ -33,6 +34,10 @@ def load_config(profile: str) -> CompanyConfig:
         company_name=rules["company_name"],
         assistant_role=rules["assistant_role"],
         language=rules["language"],
+        # Hints for the speech-to-text. Without them the transcript drifted into Korean,
+        # Spanish and Chinese mid-conversation — the model understood the Thai perfectly
+        # every time, but the customer reads the screen, not the model's intent.
+        transcription_languages=rules.get("transcription_languages") or [],
         enquiry_prefix=rules["enquiry_prefix"],
         persona=(base / "persona.md").read_text(encoding="utf-8").strip(),
         products=json.loads((base / "products.json").read_text(encoding="utf-8")),

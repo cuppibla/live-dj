@@ -522,3 +522,11 @@ def test_a_partly_matching_need_is_not_claimed_as_a_match():
     for r in recs:
         if "matches the stated need" in r["why"]:
             assert r["category"] not in unrelated, r["name"]
+
+
+def test_every_profile_pins_its_transcription_languages():
+    for profile in ("kittichet", "default"):
+        cfg = load_config(profile)
+        assert cfg.transcription_languages, profile
+        for code in cfg.transcription_languages:
+            assert "-" in code, f"{profile}: {code} is not a BCP-47 code"

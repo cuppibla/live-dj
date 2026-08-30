@@ -2,6 +2,10 @@
   "company_name": "Kittichet SPR",
   "assistant_role": "Hygiene and facility sales consultant",
   "language": "Thai",
+  "transcription_languages": [
+    "th-TH",
+    "en-US"
+  ],
   "enquiry_prefix": "KT-POC",
   "customer_segments": [
     "hotel",

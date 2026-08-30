@@ -39,11 +39,25 @@ VOICE = os.getenv("LIVE_VOICE", "Aoede")
 
 client = genai.Client()  # reads GOOGLE_API_KEY + GOOGLE_GENAI_USE_VERTEXAI=FALSE from .env
 
+# Pinning the transcription language is Vertex/Enterprise only — the Developer API rejects
+# language_codes outright at session open. The profile still declares its languages so the
+# setting travels if this ever moves to Vertex; here it is simply dropped.
+USE_VERTEX = os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "FALSE").strip().upper() == "TRUE"
+if CONFIG.transcription_languages and not USE_VERTEX:
+    log.warning(
+        "transcription_languages=%s ignored: the Gemini Developer API does not support "
+        "language_codes, so the transcript language is auto-detected and can drift on "
+        "short utterances. Vertex AI supports it.", CONFIG.transcription_languages)
+TRANSCRIPTION = ({"language_codes": CONFIG.transcription_languages}
+                 if USE_VERTEX and CONFIG.transcription_languages else {})
+
 LIVE_CONFIG = {
     "response_modalities": ["AUDIO"],
     "system_instruction": SYSTEM_INSTRUCTION,
-    "input_audio_transcription": {},
-    "output_audio_transcription": {},
+    # Language hints come from the active company profile, not from here — a customer
+    # configured for another market pins its own languages. Empty on the Developer API.
+    "input_audio_transcription": TRANSCRIPTION,
+    "output_audio_transcription": TRANSCRIPTION,
     "speech_config": {"voice_config": {"prebuilt_voice_config": {"voice_name": VOICE}}},
     "tools": [{"function_declarations": TOOL_DECLARATIONS}],
     # Live sessions accumulate context server-side, so every turn in a long call is

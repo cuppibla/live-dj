@@ -2,8 +2,13 @@
   "company_name": "Demo Company",
   "assistant_role": "Solutions sales consultant",
   "language": "English",
+  "transcription_languages": [
+    "en-US"
+  ],
   "enquiry_prefix": "DEMO",
-  "customer_segments": ["general"],
+  "customer_segments": [
+    "general"
+  ],
   "qualification_fields": [
     "contact_name",
     "company_name",

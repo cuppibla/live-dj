@@ -84,6 +84,15 @@ COMPANY_PROFILE=default uv run uvicorn backend.raw_server:app --port 8000
 
 Same engine, different company, different language, different catalogue — no code change.
 
+## If the transcript shows the wrong language
+
+Short replies ("ครับ", "ok", a grunt) sometimes come back on screen as Korean, Chinese or
+Spanish. The assistant still understood you — only the displayed line is wrong, and the
+recommendation and requirement panels are unaffected. It cannot be pinned on this API tier
+(`language_codes` is Vertex-only), so if the audience notices, say the transcript is a live
+speech-to-text feed and keep going. Speaking in full sentences rather than one-word answers
+makes it much rarer.
+
 ## Typed fallback prompts
 
 If Thai speech recognition misfires, switch to English mid-call — the assistant follows the
