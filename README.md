@@ -1,29 +1,93 @@
-# live-dj — a voice agent you can interrupt
+# MERCIL Voice Sales Agent
 
-Talk to **Mira**, a late-night radio DJ. Ask her to play something. Talk over her mid-sentence and she stops, listens, and picks the thread back up.
+A configurable, real-time AI sales consultant you can interrupt. It speaks with a prospective
+customer, works out what their business actually needs, recommends only what's in the approved
+catalogue, and hands a qualified enquiry to the human sales team.
 
-Built on the **Gemini Live API** with the raw `google-genai` SDK — no agent framework, so you can see the whole primitive. This is the demo from **EP1 of the Multimodal Agents Cookbook**.
+The product is the engine. **Kittichet SPR is a configuration** — one folder of Markdown and JSON.
 
-![live-dj](docs/screenshot.png)
+```
+MERCIL Voice Sales Agent
+Currently representing: Kittichet SPR
+```
 
-## How it works
+Built on the **Gemini Live API** with the raw `google-genai` SDK — no agent framework, so the whole
+primitive stays visible.
 
-![architecture](docs/architecture.png)
+> **Proof of concept.** All catalogue data is demonstration data. No real prices, stock, or
+> Kittichet product information. Enquiries are mock objects, not CRM records.
 
-The browser owns the audio (mic worklet down to 16 kHz, 24 kHz playback, barge-in). The server owns the socket — one `client.aio.live.connect()` session per browser, two asyncio tasks. The model owns the turn.
+## Run it
 
-## The two files that matter
+```bash
+uv sync
+cp .env.example .env          # paste your GOOGLE_API_KEY (Gemini Developer API / AI Studio, not Vertex)
 
-| File | Lines | What it is |
-|---|---|---|
-| [`backend/raw_minimal.py`](backend/raw_minimal.py) | **39** | The entire primitive: open a session, send the mic, receive voice, play it. Nothing else. |
-| [`backend/raw_server.py`](backend/raw_server.py) | 121 | The full app — the same loop plus Mira's persona, music tools, transcripts, and barge-in. |
+uv run uvicorn backend.raw_server:app --port 8000
+```
 
-Start with the minimal one. Everything that makes Mira *Mira* is the difference between those two files.
+Open <http://localhost:8000>, **put headphones on** (otherwise it hears itself), tap 🎙 and talk.
+Then **talk over it** mid-sentence — barge-in is the most visible thing here.
+
+The demonstration path is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+
+## The product / configuration split
+
+Everything company-specific lives in one directory. Nothing about Kittichet is in the Python.
+
+```
+company-configs/
+├── kittichet/          # the first demonstration configuration
+│   ├── persona.md          # who the consultant is, how it qualifies, what it must never do
+│   ├── products.json       # 18 demo product families
+│   └── sales-rules.json    # identity, language, segments, safety rules, enquiry prefix
+└── default/            # generic, English — the unconfigured product
+```
+
+Switch customer with one environment variable:
+
+```bash
+COMPANY_PROFILE=default uv run uvicorn backend.raw_server:app --port 8000
+```
+
+Same voice engine, different company, different language, different catalogue, rebranded UI — no
+code change. That's the whole claim, and it's one command to check.
+
+## What's inside
+
+| | |
+|---|---|
+| `backend/raw_server.py` | the raw Gemini Live loop + sales-tool dispatch — the reusable engine |
+| `backend/config.py` | loads `company-configs/<COMPANY_PROFILE>/` and builds the system instruction |
+| `backend/catalog.py` | pure catalogue search + recommendation ranking |
+| `backend/tools.py` | `search_products` · `recommend_products` · `capture_requirements` · `create_sales_enquiry` |
+| `backend/raw_minimal.py` | the 39-line voice-only extract (from upstream, unmodified) |
+| `backend/gotcha_send_client_content.py` | the wrong-way/right-way example (from upstream, unmodified) |
+| `frontend/` | 16 kHz mic worklet, 24 kHz playback, client-side barge-in, requirement + recommendation + enquiry panels |
+| `tests/test_sales.py` | 18 tests over the config, catalogue, and tool layer |
+| `docs/DEMO_SCRIPT.md` | the 90-second presentation path and acceptance checklist |
+| `docs/brainstorm.md` | the product thinking this was built from |
+
+## How the grounding works
+
+Two rules do most of the work, and neither is left to the prompt alone:
+
+**Recommendations can't leave the catalogue.** `recommend_products` treats the customer's segment
+as a *filter*, not a hint — a hotel is never offered a product only sold into factories. Every
+result carries a `why` string built from the catalogue data, so the assistant explains its
+reasoning from data instead of inventing one.
+
+**Enquiries can't skip confirmation.** `create_sales_enquiry` returns `not_confirmed` and emits
+nothing to the UI unless `confirmed=true`. The prompt asks the assistant to summarise and get a
+spoken yes; the tool makes it impossible to submit without one.
+
+Prices, availability, specifications, and chemical safety are never answered — the assistant says
+so and offers a human specialist.
 
 ## The gotcha — why your voice agent goes silent after one sentence
 
-`session.receive()` is a **per-turn** async generator. It ends the moment the model finishes one reply. Iterate it once and your agent answers exactly one sentence, then never speaks again:
+`session.receive()` is a **per-turn** async generator. It ends the moment the model finishes one
+reply. Iterate it once and your agent answers exactly one sentence, then never speaks again:
 
 ```python
 # ❌ one reply, then silence forever
@@ -36,45 +100,31 @@ while True:
         ...
 ```
 
-That's the bug this repo exists to show you. A coding agent writes the first version by default. The second one is in [`raw_minimal.py`](backend/raw_minimal.py#L49).
-
-Its sibling is in [`backend/gotcha_send_client_content.py`](backend/gotcha_send_client_content.py): mic audio goes to `send_realtime_input`, **not** `send_client_content` — get that wrong and the model simply never hears you.
-
-## Run it
-
-```bash
-uv sync
-cp .env.example .env          # paste your GOOGLE_API_KEY (Gemini Developer API / AI Studio, not Vertex)
-
-uv run uvicorn backend.raw_server:app --port 8000     # the full DJ
-# or
-uv run uvicorn backend.raw_minimal:app --port 8000    # just the 39-line primitive
-```
-
-Open <http://localhost:8000>, **put headphones on** (otherwise she hears her own radio), tap 🎙 and talk.
-
-Try: *"hey Mira"* · *"can you play something dream pop"* · *"skip this"* · *"what do you think of the music?"* — then **talk over her** while she's speaking.
-
-## What's inside
-
-| | |
-|---|---|
-| `backend/raw_server.py` | the raw Gemini Live loop + music-tool dispatch |
-| `backend/raw_minimal.py` | the 39-line voice-only extract |
-| `backend/tools.py` | `play_playlist` / `play_track` / `skip` / `pause` — they return **instantly**, so the voice never stalls |
-| `backend/persona.py` · `assets/mira_persona.txt` | who Mira is |
-| `backend/gotcha_send_client_content.py` | the wrong-way/right-way example |
-| `frontend/` | minimal browser client: 16 kHz mic worklet, 24 kHz playback, client-side barge-in, music ducking |
-| `assets/tracks/` | four dream-pop tracks |
-| `docs/` | the product / UX / engineering design docs + the de-risk test |
+Its sibling is in [`backend/gotcha_send_client_content.py`](backend/gotcha_send_client_content.py):
+mic audio goes to `send_realtime_input`, **not** `send_client_content` — get that wrong and the
+model simply never hears you.
 
 ## Notes
 
-- **Voice** is a Gemini Live *native* voice (`LIVE_VOICE`, default `Aoede`) — the Live API has its own voice set, so it can't reproduce a TTS voice you used elsewhere. The persona carries the character, not the timbre.
-- **Barge-in** is client-side: the browser cuts playback the instant the mic hears you (RMS gate in `frontend/main.js`), which feels faster than waiting for the server signal. The server forwards `interrupted` too.
-- **Music ducking** drops the track to 12% while Mira speaks, then brings it back.
-- The four tracks and Mira's persona come from **aniradio**, a static AI-radio app of mine — the music is generated with **Lyria 3 Pro**.
+- **Voice** is a Gemini Live *native* voice (`LIVE_VOICE`, default `Aoede`). The Live API has its
+  own voice set. The persona carries the character, not the timbre.
+- **Barge-in** is client-side: the browser cuts playback the instant the mic hears you (RMS gate in
+  `frontend/main.js`), which feels faster than waiting for the server signal. The server forwards
+  `interrupted` too.
+- **Tools return instantly.** In a live session function calls are synchronous — the voice pauses
+  until the tool returns, so every handler does list filtering and nothing else.
+- The model is **audio-only**; `response_modalities: ["TEXT"]` is rejected by
+  `gemini-3.1-flash-live-preview`.
 
-## Going deeper
+## Attribution and licensing
 
-The same live loop rebuilt on **Google ADK** (`run_live` + `LiveRequestQueue`), plus a raw-SDK-vs-ADK exercise, lives in [`cuppibla/multimodal-levels`](https://github.com/cuppibla/multimodal-levels) → `05-live/`.
+The real-time voice foundation is derived from **[`cuppibla/live-dj`](https://github.com/cuppibla/live-dj)**,
+a demonstration of the Gemini Live API (EP1 of the Multimodal Agents Cookbook) — originally a
+late-night radio DJ. The live loop in `raw_server.py`, the `session.receive()` per-turn gotcha,
+`raw_minimal.py`, `gotcha_send_client_content.py`, and the browser audio pipeline all come from
+there. The sales layer, configuration system, catalogue, tools, and UI panels are new.
+
+The upstream repository does not carry an explicit open-source license, so default copyright
+applies. This prototype is private and non-commercial. Before any commercial delivery, either
+obtain explicit permission from the author or reimplement the voice foundation from the official
+API documentation. Do not present the upstream implementation as proprietary work.
