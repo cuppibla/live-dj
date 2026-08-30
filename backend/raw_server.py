@@ -46,6 +46,16 @@ LIVE_CONFIG = {
     "output_audio_transcription": {},
     "speech_config": {"voice_config": {"prebuilt_voice_config": {"voice_name": VOICE}}},
     "tools": [{"function_declarations": TOOL_DECLARATIONS}],
+    # Live sessions accumulate context server-side, so every turn in a long call is
+    # priced against a bigger context than the last. The sliding window caps that. It is
+    # set well above a demo conversation, so it should never fire during a presentation —
+    # it exists to stop an afternoon of rehearsal compounding. The system instruction is
+    # never truncated, and the requirements/shortlist live in tools.py rather than in the
+    # model's context, so the panels survive a truncation even if the chat memory doesn't.
+    "context_window_compression": {
+        "trigger_tokens": 20000,
+        "sliding_window": {"target_tokens": 10000},
+    },
 }
 
 app = FastAPI(title="MERCIL Voice Sales Agent")

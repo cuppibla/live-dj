@@ -29,6 +29,11 @@ uv run uvicorn backend.raw_server:app --port 8000
 Open <http://localhost:8000>, **put headphones on** (otherwise it hears itself), tap 🎙 and talk.
 Then **talk over it** mid-sentence — barge-in is the most visible thing here.
 
+**End the call when you are done.** The mic streams to Gemini for as long as it is open and
+audio is billed by the second whether anyone is speaking or not, so an open tab on an empty room
+costs the same as a conversation. The button hangs up, and the session also ends itself after two
+minutes of silence or when the tab closes.
+
 The demonstration path is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
 
 ## The product / configuration split
@@ -124,6 +129,10 @@ model simply never hears you.
   until the tool returns, so every handler does list filtering and nothing else.
 - The model is **audio-only**; `response_modalities: ["TEXT"]` is rejected by
   `gemini-3.1-flash-live-preview`.
+- **Cost.** Live sessions bill continuously on streamed audio, so the controls that matter are
+  hanging up and not leaving the tab open — not the model choice, which is already the Flash tier.
+  Context also accumulates server-side for the life of a session, so `context_window_compression`
+  caps it with a sliding window set well above any demo-length conversation.
 
 ## Attribution and licensing
 

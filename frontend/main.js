@@ -10,7 +10,12 @@ const wantEl = $("wanted"), wantPanel = $("wantedpanel");
 const companyEl = $("company");
 
 const BARGE_RMS = 0.02;
-let ws, audioCtx, workletNode, micStream;
+const VOICE_RMS = 0.015;          // anything above this counts as someone being present
+const IDLE_MS = 120000;           // hang up after two minutes of true silence
+const talkBtn = $("talk");
+
+let ws, audioCtx, workletNode, micStream, micSource;
+let live = false, idleTimer = null, lastVoiceAt = 0;
 let nextStart = 0;
 let activeSources = [];
 let speaking = false;
@@ -130,6 +135,7 @@ function renderEnquiry(m) {
 
 // ---------- voice playback (24k PCM from the server) ----------
 function playVoice(buf) {
+  if (!audioCtx) return;                 // a frame can land in the gap after the call ends
   const int16 = new Int16Array(buf);
   const f32 = new Float32Array(int16.length);
   for (let i = 0; i < int16.length; i++) f32[i] = int16[i] / 0x8000;
@@ -154,8 +160,8 @@ function connect() {
   const proto = location.protocol === "https:" ? "wss" : "ws";
   ws = new WebSocket(`${proto}://${location.host}/ws`);
   ws.binaryType = "arraybuffer";
-  ws.onopen = () => { setStatus("listening…"); setOrb("listening"); };
-  ws.onclose = () => { setStatus("the line dropped — reload to reconnect"); setOrb("idle"); };
+  ws.onopen = () => { setStatus("listening…"); setOrb("listening"); watchForIdle(); };
+  ws.onclose = () => { if (live) endCall("the line dropped — tap to start again"); };
   ws.onmessage = (evt) => {
     if (typeof evt.data !== "string") { playVoice(evt.data); return; }     // binary = voice
     const m = JSON.parse(evt.data);
@@ -175,14 +181,48 @@ async function startMic() {
   micStream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
   });
-  const source = audioCtx.createMediaStreamSource(micStream);
+  micSource = audioCtx.createMediaStreamSource(micStream);
   workletNode = new AudioWorkletNode(audioCtx, "pcm-processor");
   workletNode.port.onmessage = (e) => {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(e.data.pcm);       // 16k PCM up
     if (e.data.rms >= BARGE_RMS && speaking) stopVoice();                  // client-side barge-in
+    if (e.data.rms >= VOICE_RMS) lastVoiceAt = Date.now();                 // someone is in the room
   };
-  source.connect(workletNode);
+  micSource.connect(workletNode);
   workletNode.connect(audioCtx.destination);                              // keeps the graph alive (silent)
+}
+
+// The mic streams to Gemini for as long as it is open, and audio is billed by the second
+// whether anyone is talking or not. Without this, leaving the tab open over lunch bills a
+// full hour of an empty room — which is how the API budget went, not the conversations.
+function endCall(reason) {
+  if (!live) return;
+  live = false;
+  clearInterval(idleTimer); idleTimer = null;
+  try { ws && ws.close(); } catch {}
+  try { micStream && micStream.getTracks().forEach((t) => t.stop()); } catch {}
+  try { micSource && micSource.disconnect(); } catch {}
+  try { workletNode && workletNode.disconnect(); } catch {}
+  try { audioCtx && audioCtx.close(); } catch {}
+  ws = micStream = micSource = workletNode = audioCtx = null;
+  stopVoice();
+  endTurn();
+  setOrb("idle");
+  setStatus(reason);
+  talkBtn.textContent = "🎙 start call";
+  talkBtn.disabled = false;
+}
+
+function watchForIdle() {
+  lastVoiceAt = Date.now();
+  clearInterval(idleTimer);
+  idleTimer = setInterval(() => {
+    // The assistant talking counts as activity: never hang up mid-sentence.
+    if (speaking) { lastVoiceAt = Date.now(); return; }
+    if (Date.now() - lastVoiceAt > IDLE_MS) {
+      endCall(`ended after ${IDLE_MS / 1000}s of silence — tap to start again`);
+    }
+  }, 2000);
 }
 
 // Branding comes from the active company profile, not from this file — so switching
@@ -196,18 +236,27 @@ async function loadBranding() {
 }
 
 async function go() {
-  $("talk").disabled = true;
+  talkBtn.disabled = true;
   setStatus("connecting…"); setOrb("thinking");
   try {
     await startMic();
     connect();
-    $("talk").textContent = "● live";
+    live = true;
+    talkBtn.textContent = "■ end call";
+    talkBtn.disabled = false;
   } catch (err) {
     setStatus("microphone blocked: " + err.message);
     setOrb("idle");
-    $("talk").disabled = false;
+    talkBtn.disabled = false;
   }
 }
 
-$("talk").addEventListener("click", go);
+talkBtn.addEventListener("click", () => {
+  if (live) endCall("call ended — tap to start again");
+  else go();
+});
+
+// Closing or reloading the tab must tear the session down too, not leave it streaming.
+window.addEventListener("pagehide", () => endCall("call ended"));
+
 loadBranding();

@@ -18,6 +18,8 @@ Open <http://localhost:8000>. Before you tap anything, check the header reads
 - [ ] Quiet room
 - [ ] Browser mic permission already granted
 - [ ] Backup video ready in case the network or the Live API misbehaves
+- [ ] API budget checked at <https://ai.studio/spend> — a spending cap stops the demo dead
+- [ ] **End the call** after each rehearsal run; an open tab keeps streaming audio and billing
 
 ## Opening line to the audience
 
