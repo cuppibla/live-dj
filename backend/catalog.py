@@ -44,6 +44,23 @@ def _token_matches(token: str, hay: str) -> bool:
 # decided the ranking — invisible at 18 products, badly wrong at 55.
 _STRONG, _MID, _WEAK = 3, 2, 1
 
+# Function words score points against any product that happens to contain them — "to"
+# earned the ice machine two points off "capacity sized to daily consumption".
+_STOPWORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "have", "has", "in",
+    "is", "it", "its", "my", "need", "needs", "of", "on", "or", "our", "some", "that",
+    "the", "there", "this", "to", "want", "wants", "we", "with", "you", "your",
+}
+
+
+def _content_tokens(text: str) -> list:
+    seen, out = set(), []
+    for t in (text or "").lower().split():
+        if len(t) > 1 and t not in _STOPWORDS and t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
 
 def _fields(p: dict):
     strong = " ".join([p.get("name", ""), p.get("name_th", ""),
@@ -177,10 +194,20 @@ def recommend(products: list, business_type: str, needs: list) -> list:
         score = 2 if bt and bt in types else 0
         matched = []
         for need in needs:
-            hit = sum(_token_score(tok, p) for tok in need.split())
-            if hit:
-                matched.append(need)
-                score += hit
+            toks = _content_tokens(need)
+            if not toks:
+                continue
+            hits = [_token_score(tok, p) for tok in toks]
+            n = sum(1 for h in hits if h)
+            # A phrase is not satisfied by one incidental word. "scrubbing machines to
+            # replace manual scrubbing" matched the Modular Ice Machine on "machines"
+            # alone, and the card then claimed it met that need. Longer needs have to
+            # match on more than one content word, and the score scales with how much of
+            # the phrase actually landed.
+            if n < (1 if len(toks) <= 2 else 2):
+                continue
+            matched.append(need)
+            score += sum(hits) * (n / len(toks))
         if score == 0:
             continue
         scored.append((score, {**p, "why": _why(p, matched, bt)}))

@@ -260,6 +260,19 @@ def dispatch_tool(name: str, args: dict):
                  "not_found": not_found})
 
     if name == "create_sales_enquiry":
+        # A lead nobody can answer is not a lead. Checked BEFORE confirmation, so the
+        # assistant never asks for a yes and then refuses — it submitted an enquiry with
+        # no name, phone or email and the customer had to ask if it could reach them.
+        if not (_requirements.get("phone") or _requirements.get("email_or_line")):
+            missing = ["phone number", "email or LINE"]
+            if not _requirements.get("contact_name"):
+                missing.insert(0, "the customer's name")
+            return [], {"result": "missing_contact",
+                        "instruction": "Do not submit yet. You still need a way for the sales "
+                                       "team to reach this customer: ask for " + ", or ".join(missing)
+                                       + ". Record it with capture_requirements, then read the "
+                                         "summary back including the contact details and ask "
+                                         "for confirmation."}
         if not args.get("confirmed"):
             return [], {"result": "not_confirmed",
                         "instruction": "Summarize the customer details and requirements aloud, "

@@ -11,8 +11,13 @@
     --bg:#0d1014; --panel:rgba(255,255,255,0.025);
   }
   * { box-sizing: border-box; }
+  /* The app owns the viewport: only the panel column scrolls. With the page free to grow,
+     every new recommendation pushed the document taller, and because the voice column is
+     vertically centred the orb and the mic button drifted down out of sight — so adding
+     data on the right dragged the left away and you had to scroll back to it. */
+  html { height: 100%; }
   body {
-    margin: 0; min-height: 100vh; color: var(--ink);
+    margin: 0; height: 100vh; height: 100dvh; overflow: hidden; color: var(--ink);
     font-family: ui-sans-serif, system-ui, "Segoe UI", Inter, "Noto Sans Thai", sans-serif;
     background:
       radial-gradient(ellipse at 12% 0%, rgba(127,179,213,0.07) 0%, transparent 50%),
@@ -23,7 +28,7 @@
 
   /* ---- header ---- */
   .chrome { display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 20px 28px 16px; border-bottom: 1px solid var(--line); }
+    padding: 20px 28px 16px; border-bottom: 1px solid var(--line); flex: none; }
   .brand { font-size: 15px; letter-spacing: 0.04em; font-weight: 600; }
   .rep { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--faint); margin-top: 5px; }
@@ -32,10 +37,13 @@
     border: 1px solid rgba(232,184,125,0.35); border-radius: 999px; padding: 5px 11px; white-space: nowrap; }
 
   /* ---- layout ---- */
-  .wrap { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 0; }
+  .wrap { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    min-height: 0; overflow: hidden; }
   .voice { display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 20px; padding: 24px 28px 32px; border-right: 1px solid var(--line); }
-  .panels { padding: 22px 28px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+    gap: 20px; padding: 24px 28px 32px; border-right: 1px solid var(--line);
+    min-height: 0; min-width: 0; overflow: hidden; }
+  .panels { padding: 22px 28px 32px; display: flex; flex-direction: column; gap: 20px;
+    min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; }
 
   /* ---- orb ---- */
   .orb { width: 190px; height: 190px; border-radius: 50%; flex: none;
@@ -80,11 +88,12 @@
   .req:last-child { border-bottom: none; }
   .req .k { flex: 0 0 116px; color: var(--faint); font-size: 11px; letter-spacing: 0.06em;
     text-transform: uppercase; padding-top: 2px; }
-  .req .v { flex: 1; }
+  .req .v { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 
   .card { border: 1px solid var(--line); border-left: 2px solid var(--accent); border-radius: 6px;
     padding: 11px 13px; margin-bottom: 9px; background: rgba(255,255,255,0.02); }
   .card:last-child { margin-bottom: 0; }
+  .card { overflow-wrap: anywhere; }
   .card .name { font-size: 13.5px; font-weight: 600; }
   .card .th { font-size: 12px; color: var(--dim); margin-top: 2px; }
   .card .cat { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
@@ -110,9 +119,13 @@
   .enquiry .meta { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--faint); margin-top: 11px; }
 
+  /* On a narrow screen a locked viewport with two nested scrollers is worse than just
+     letting the page scroll, so hand it back. */
   @media (max-width: 860px) {
-    .wrap { grid-template-columns: 1fr; }
-    .voice { border-right: none; border-bottom: 1px solid var(--line); }
+    body { height: auto; overflow: auto; }
+    .wrap { grid-template-columns: 1fr; overflow: visible; }
+    .voice { border-right: none; border-bottom: 1px solid var(--line); overflow: visible; }
+    .panels { overflow: visible; }
     .orb { width: 140px; height: 140px; }
   }
 </style>

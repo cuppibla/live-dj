@@ -1166,7 +1166,8 @@
       "factory",
       "retail",
       "hospital",
-      "office"
+      "office",
+      "restaurant"
     ],
     "use_cases": [
       "large hard floor area",
@@ -1195,7 +1196,8 @@
       "hotel",
       "factory",
       "office",
-      "retail"
+      "retail",
+      "restaurant"
     ],
     "use_cases": [
       "floor polishing and deep scrub",
@@ -1254,7 +1256,8 @@
     "customer_types": [
       "hotel",
       "office",
-      "retail"
+      "retail",
+      "restaurant"
     ],
     "use_cases": [
       "guest room and corridor carpet",

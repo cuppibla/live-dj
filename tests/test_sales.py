@@ -97,6 +97,7 @@ def test_capture_requirements_ignores_empty_values():
 
 def test_enquiry_refuses_without_confirmation():
     tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"phone": "0651049961"})
     events, result = tools.dispatch_tool(
         "create_sales_enquiry", {"summary": "80-room hotel", "confirmed": False})
     assert events == []
@@ -105,7 +106,9 @@ def test_enquiry_refuses_without_confirmation():
 
 def test_enquiry_creates_numbered_reference_when_confirmed():
     tools.reset_state()
-    tools.dispatch_tool("capture_requirements", {"business_type": "hotel", "contact_name": "Khun A"})
+    tools.dispatch_tool("capture_requirements",
+                        {"business_type": "hotel", "contact_name": "Khun A",
+                         "phone": "0651049961"})
     events, result = tools.dispatch_tool(
         "create_sales_enquiry", {"summary": "80-room hotel in Khao Yai", "confirmed": True})
     assert result["enquiry_id"] == f"{CONFIG.enquiry_prefix}-001"
@@ -257,6 +260,7 @@ def test_shortlist_resets_with_the_session():
 def test_enquiry_carries_the_products_actually_discussed():
     tools.reset_state()
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    tools.dispatch_tool("capture_requirements", {"phone": "0651049961"})
     events, result = tools.dispatch_tool(
         "create_sales_enquiry", {"summary": "hotel washrooms", "confirmed": True})
     assert result["products_discussed"]
@@ -343,6 +347,7 @@ def test_enquiry_separates_wanted_from_merely_discussed():
     tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
     tools.dispatch_tool("record_customer_interest",
                         {"products": ["kt-tissue-dispenser-controlled"], "interest": "wanted"})
+    tools.dispatch_tool("capture_requirements", {"phone": "0651049961"})
     events, result = tools.dispatch_tool(
         "create_sales_enquiry", {"summary": "hotel washrooms", "confirmed": True})
     assert [p["name"] for p in result["products_wanted"]] == ["Controlled Tissue Dispenser System"]
@@ -440,3 +445,80 @@ def test_stemming_reaches_across_english_word_endings():
 def test_a_short_token_does_not_prefix_match_a_longer_word():
     hits = catalog.search(CONFIG.products, query="Ecolab")
     assert all("Ecolab" in h["brands"] for h in hits)
+
+
+# --- an enquiry nobody can answer is not a lead ---
+
+def test_enquiry_refuses_without_any_way_to_contact_the_customer():
+    """It submitted KT-POC-001 with no name, phone or email, and the customer had to ask
+    whether it could even reach them. The whole product promise is a qualified lead."""
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"business_type": "hotel", "scale": "80 rooms"})
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "80-room hotel", "confirmed": True})
+    assert events == []
+    assert result["result"] == "missing_contact"
+    assert "phone" in result["instruction"] and "email" in result["instruction"]
+
+
+def test_enquiry_accepts_a_phone_alone():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"phone": "0651049961"})
+    _, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel", "confirmed": True})
+    assert result["enquiry_id"].endswith("-001")
+
+
+def test_enquiry_accepts_an_email_alone():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"email_or_line": "taro@mercil.co.th"})
+    _, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel", "confirmed": True})
+    assert result["enquiry_id"].endswith("-001")
+
+
+def test_a_name_alone_is_not_a_contact_channel():
+    """A name with no phone or email cannot be followed up."""
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"contact_name": "คุณธนวัฒน์"})
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel", "confirmed": True})
+    assert events == []
+    assert result["result"] == "missing_contact"
+
+
+def test_missing_contact_is_checked_before_confirmation():
+    """Asking for a yes and then refusing would make the assistant look broken."""
+    tools.reset_state()
+    _, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel", "confirmed": False})
+    assert result["result"] == "missing_contact"
+
+
+def test_the_instruction_names_what_is_still_missing():
+    tools.reset_state()
+    tools.dispatch_tool("capture_requirements", {"phone": "0651049961"})
+    _, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel", "confirmed": False})
+    assert result["result"] == "not_confirmed"      # contact is satisfied, so confirm next
+
+
+# --- a need must match a product substantially, not on one incidental word ---
+
+def test_a_single_generic_word_does_not_carry_a_recommendation():
+    """The demo showed "Modular Ice Machine — matches the stated need for scrubbing
+    machines to replace manual scrubbing". It matched on the word "machines"."""
+    recs = catalog.recommend(CONFIG.products, "hotel",
+                             ["scrubbing machines to replace manual scrubbing"])
+    assert "ice_machine" not in [r["category"] for r in recs]
+    assert recs[0]["category"] in ("floor_machine", "scrubbing_pad")
+
+
+def test_a_partly_matching_need_is_not_claimed_as_a_match():
+    recs = catalog.recommend(CONFIG.products, "hotel",
+                             ["scrubbing machines to replace manual scrubbing"])
+    unrelated = {"ice_machine", "rice", "glassware", "tableware", "food_packaging",
+                 "facial_tissue", "toilet_tissue"}
+    for r in recs:
+        if "matches the stated need" in r["why"]:
+            assert r["category"] not in unrelated, r["name"]
