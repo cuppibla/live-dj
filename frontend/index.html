@@ -89,6 +89,15 @@
     color: var(--faint); margin-top: 8px; }
 
   .card.lookup { border-left-color: rgba(230,232,236,0.22); opacity: 0.72; }
+  .card.declined { opacity: 0.4; }
+  .card.declined .name { text-decoration: line-through; }
+
+  .panel.wanted { border-color: rgba(127,179,213,0.4); background: rgba(127,179,213,0.05); }
+  .panel.wanted h2 { color: var(--accent); }
+  .panel.wanted .card { border-left-width: 3px; background: rgba(255,255,255,0.03); }
+
+  .enquiry .wantlist { margin-top: 10px; }
+  .enquiry .wantlist div { font-size: 12.5px; padding: 2px 0; }
 
   .enquiry { border-color: rgba(232,184,125,0.4); background: rgba(232,184,125,0.05); }
   .enquiry .eid { font-size: 24px; letter-spacing: 0.06em; color: var(--warm); font-weight: 600; }
@@ -126,14 +135,19 @@
         <h2>Customer requirements</h2>
         <div id="requirements"><div class="empty">— not yet captured —</div></div>
       </section>
+      <section id="wantedpanel" class="panel wanted" hidden>
+        <h2>Customer wants</h2>
+        <div id="wanted"></div>
+      </section>
       <section class="panel">
-        <h2>Products discussed</h2>
+        <h2>Also discussed</h2>
         <div id="products"><div class="empty">— products appear as you talk —</div></div>
       </section>
       <section id="enquiry" class="panel enquiry" hidden>
         <h2>Enquiry prepared</h2>
         <div class="eid"></div>
         <div class="esum"></div>
+        <div class="wantlist"></div>
         <div class="meta">Prepared for the sales team · demonstration only</div>
       </section>
     </div>

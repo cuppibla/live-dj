@@ -122,8 +122,8 @@ def test_unknown_tool_is_not_fatal():
 
 def test_declarations_cover_every_dispatchable_tool():
     names = {d["name"] for d in tools.TOOL_DECLARATIONS}
-    assert names == {"search_products", "recommend_products",
-                     "capture_requirements", "create_sales_enquiry"}
+    assert names == {"search_products", "recommend_products", "capture_requirements",
+                     "record_customer_interest", "create_sales_enquiry"}
     for d in tools.TOOL_DECLARATIONS:
         assert d["parameters"]["type"] == "object"
         assert d["description"]
@@ -279,3 +279,73 @@ def test_search_ranks_by_how_many_tokens_matched():
 def test_search_still_matches_word_prefixes():
     assert catalog.search(CONFIG.products, query="dispens")
     assert catalog.search(CONFIG.products, query="clean")
+
+
+# --- what the customer actually asked for, as opposed to what merely came up ---
+
+def test_customer_interest_marks_a_product_wanted():
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    events, result = tools.dispatch_tool(
+        "record_customer_interest",
+        {"products": ["demo-product-001"], "interest": "wanted"})
+    wanted = [i for i in events[0]["items"] if i["interest"] == "wanted"]
+    assert [w["id"] for w in wanted] == ["demo-product-001"]
+    assert result["wanted"] == ["Demo Controlled Tissue Dispenser"]
+
+
+def test_customer_interest_resolves_a_product_by_name():
+    """The model works from what it said aloud, not from ids it may not have kept."""
+    tools.reset_state()
+    events, result = tools.dispatch_tool(
+        "record_customer_interest", {"products": ["Modular Ice Machine"], "interest": "wanted"})
+    assert result["wanted"] == ["Demo Modular Ice Machine"]
+    assert events[0]["items"][0]["interest"] == "wanted"
+
+
+def test_customer_interest_adds_a_product_not_yet_on_the_panel():
+    tools.reset_state()
+    events, _ = tools.dispatch_tool(
+        "record_customer_interest", {"products": ["demo-product-018"], "interest": "wanted"})
+    assert any(i["id"] == "demo-product-018" for i in events[0]["items"])
+
+
+def test_customer_interest_can_be_withdrawn():
+    tools.reset_state()
+    tools.dispatch_tool("record_customer_interest",
+                        {"products": ["demo-product-018"], "interest": "wanted"})
+    events, _ = tools.dispatch_tool("record_customer_interest",
+                                    {"products": ["demo-product-018"], "interest": "declined"})
+    item = next(i for i in events[0]["items"] if i["id"] == "demo-product-018")
+    assert item["interest"] == "declined"
+
+
+def test_customer_interest_reports_what_it_could_not_resolve():
+    tools.reset_state()
+    _, result = tools.dispatch_tool(
+        "record_customer_interest", {"products": ["a flying car"], "interest": "wanted"})
+    assert result["not_found"] == ["a flying car"]
+
+
+def test_wanted_products_survive_a_later_search():
+    """What the customer asked for must not be pushed off the panel by browsing."""
+    tools.reset_state()
+    tools.dispatch_tool("record_customer_interest",
+                        {"products": ["demo-product-018"], "interest": "wanted"})
+    for q in ["dispenser", "tissue", "towel", "cleaner", "floor", "glass", "soap"]:
+        events, _ = tools.dispatch_tool("search_products", {"query": q})
+    assert any(i["id"] == "demo-product-018" and i["interest"] == "wanted"
+               for i in events[0]["items"])
+
+
+def test_enquiry_separates_wanted_from_merely_discussed():
+    tools.reset_state()
+    tools.dispatch_tool("recommend_products", {"business_type": "hotel", "needs": ["washroom"]})
+    tools.dispatch_tool("record_customer_interest",
+                        {"products": ["demo-product-001"], "interest": "wanted"})
+    events, result = tools.dispatch_tool(
+        "create_sales_enquiry", {"summary": "hotel washrooms", "confirmed": True})
+    assert [p["name"] for p in result["products_wanted"]] == ["Demo Controlled Tissue Dispenser"]
+    assert result["products_discussed"]
+    assert "demo-product-001" not in [p["id"] for p in result["products_discussed"]]
+    assert events[0]["products_wanted"]

@@ -6,6 +6,7 @@
 const $ = (id) => document.getElementById(id);
 const orb = $("orb"), statusEl = $("status"), txEl = $("transcript");
 const reqEl = $("requirements"), prodEl = $("products"), enqEl = $("enquiry");
+const wantEl = $("wanted"), wantPanel = $("wantedpanel");
 const companyEl = $("company");
 
 const BARGE_RMS = 0.02;
@@ -16,17 +17,33 @@ let speaking = false;
 
 function setOrb(state) { orb.className = "orb " + state; }       // idle | listening | thinking | speaking
 function setStatus(t) { statusEl.textContent = t; }
+// Live transcription arrives a fragment at a time — a few syllables per message. Rendering
+// each as its own line turned every sentence into a column of single words. Fragments are
+// appended to the current speaker's line instead, and a new line starts only when the
+// speaker changes or the turn ends.
+let currentLine = null, currentRole = null;
+
 function addLine(role, text) {
-  const p = document.createElement("div");
-  p.className = "line " + role;
-  const who = document.createElement("span");
-  who.className = "who";
-  who.textContent = role === "agent" ? "assistant" : "you";
-  p.appendChild(who);
-  p.appendChild(document.createTextNode(text));    // textContent, never innerHTML — this is speech
-  txEl.appendChild(p);
+  if (currentLine && currentRole === role) {
+    currentLine.body.textContent += text;
+  } else {
+    const p = document.createElement("div");
+    p.className = "line " + role;
+    const who = document.createElement("span");
+    who.className = "who";
+    who.textContent = role === "agent" ? "assistant" : "you";
+    const body = document.createElement("span");
+    body.textContent = text;                       // textContent, never innerHTML — this is speech
+    p.appendChild(who);
+    p.appendChild(body);
+    txEl.appendChild(p);
+    currentLine = { el: p, body };
+    currentRole = role;
+  }
   txEl.scrollTop = txEl.scrollHeight;
 }
+
+function endTurn() { currentLine = null; currentRole = null; }
 
 // ---------- panels (driven by the agent's tool calls) ----------
 const FIELD_LABELS = {
@@ -51,9 +68,20 @@ function renderRequirements(reqs) {
   });
 }
 
+// Two panels, one list. What the customer actually asked for is the deliverable; the rest
+// is the trail that got them there, and the sales team needs to tell them apart.
 function renderProducts(items) {
   if (!items || !items.length) return;
-  prodEl.innerHTML = "";
+  const wanted = items.filter((p) => p.interest === "wanted");
+  const rest = items.filter((p) => p.interest !== "wanted");
+  wantPanel.hidden = wanted.length === 0;
+  renderCards(wantEl, wanted);
+  renderCards(prodEl, rest);
+  if (!rest.length) prodEl.innerHTML = '<div class="empty">— everything discussed is above —</div>';
+}
+
+function renderCards(host, items) {
+  host.innerHTML = "";
   items.forEach((p) => {
     const card = document.createElement("div");
     card.className = "card";
@@ -71,13 +99,16 @@ function renderProducts(items) {
     });
     // A looked-up product is not a recommendation. Saying so on the card keeps the panel
     // honest when the assistant checked the catalogue without proposing anything.
-    if (p.source === "looked_up") card.classList.add("lookup");
+    if (p.source === "looked_up" && p.interest !== "wanted") card.classList.add("lookup");
+    if (p.interest === "declined") card.classList.add("declined");
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = (p.source === "looked_up" ? "Looked up · " : "")
+    meta.textContent = (p.interest === "wanted" ? "Customer asked for this · "
+                        : p.interest === "declined" ? "Ruled out · "
+                        : p.source === "looked_up" ? "Looked up · " : "")
       + "Price: contact sales · Availability: to confirm · demo data";
     card.appendChild(meta);
-    prodEl.appendChild(card);
+    host.appendChild(card);
   });
 }
 
@@ -85,6 +116,13 @@ function renderEnquiry(m) {
   enqEl.hidden = false;
   enqEl.querySelector(".eid").textContent = m.enquiry_id;
   enqEl.querySelector(".esum").textContent = m.summary || "";
+  const list = enqEl.querySelector(".wantlist");
+  list.innerHTML = "";
+  (m.products_wanted || []).forEach((p) => {
+    const d = document.createElement("div");
+    d.textContent = "• " + p.name + (p.name_th ? "  " + p.name_th : "");
+    list.appendChild(d);
+  });
   enqEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
   setStatus("enquiry prepared for the sales team");
 }
@@ -124,7 +162,8 @@ function connect() {
     else if (m.type === "products") renderProducts(m.items);
     else if (m.type === "requirements") renderRequirements(m.requirements);
     else if (m.type === "enquiry") renderEnquiry(m);
-    else if (m.type === "interrupted") stopVoice();
+    else if (m.type === "turn_end") endTurn();
+    else if (m.type === "interrupted") { endTurn(); stopVoice(); }
     else if (m.type === "error") { setStatus("error: " + m.message); console.error(m.message); }
   };
 }

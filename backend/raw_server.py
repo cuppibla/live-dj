@@ -93,6 +93,11 @@ async def ws(websocket: WebSocket):
                             idata = getattr(part, "inline_data", None)
                             if idata and getattr(idata, "data", None):
                                 await websocket.send_bytes(idata.data)  # 24k voice
+                    if getattr(sc, "turn_complete", None):
+                        # Closes the current transcript line. Transcription arrives in
+                        # fragments; without this the browser can't tell where a sentence
+                        # ends and two consecutive replies run together.
+                        await websocket.send_text(json.dumps({"type": "turn_end"}))
                     if getattr(sc, "interrupted", None):
                         await websocket.send_text(json.dumps({"type": "interrupted"}))
                 if tc:

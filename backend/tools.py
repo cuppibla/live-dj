@@ -33,6 +33,42 @@ def reset_state() -> None:
     _enquiry_count = 0
 
 
+def _trim() -> None:
+    """Cap the panel — but never drop something the customer said they want.
+
+    The shortlist is capped so browsing doesn't turn it into a catalogue dump. What the
+    customer actually asked for is not browsing, and losing it off the bottom of the list
+    would lose the one thing the sales team needs.
+    """
+    global _shortlist
+    keep, budget = [], MAX_SHORTLIST
+    for e in _shortlist:
+        if e.get("interest") == "wanted":
+            keep.append(e)
+        elif budget > 0:
+            keep.append(e)
+            budget -= 1
+    _shortlist = keep
+
+
+def _find(token: str):
+    """Resolve one product from an id, an English name, or a Thai name.
+
+    The assistant works from what it just said out loud, so it may pass a name rather
+    than an id it never had reason to keep.
+    """
+    t = (token or "").strip().lower()
+    if not t:
+        return None
+    for p in CONFIG.products:
+        if p["id"].lower() == t:
+            return p
+    for p in CONFIG.products:
+        if t in p["name"].lower() or (p.get("name_th") and t in p["name_th"].lower()):
+            return p
+    return None
+
+
 def _remember(items: list, source: str) -> list:
     """Add a batch to the running shortlist and return the whole thing, newest first.
 
@@ -45,11 +81,19 @@ def _remember(items: list, source: str) -> list:
     something it merely looked up.
     """
     global _shortlist
+    prior = {e["id"]: e.get("interest") for e in _shortlist}
     ids = {i["id"] for i in items}
     kept = [e for e in _shortlist if e["id"] not in ids]
-    _shortlist = [{**i, "source": source} for i in items] + kept
-    del _shortlist[MAX_SHORTLIST:]
+    _shortlist = [{**i, "source": source, "interest": prior.get(i["id"])}
+                  for i in items] + kept
+    _trim()
     return list(_shortlist)
+
+
+def _brief(p: dict) -> dict:
+    """The handoff view of a product — what a salesperson needs to act on it."""
+    return {"id": p["id"], "name": p["name"], "name_th": p.get("name_th", ""),
+            "category": p["category"], "interest": p.get("interest")}
 
 
 def _slim(p: dict) -> dict:
@@ -114,6 +158,25 @@ TOOL_DECLARATIONS = [
         },
     },
     {
+        "name": "record_customer_interest",
+        "description": (
+            "Record that the customer has said they DO want something, or that they have "
+            "ruled it out. Call this the moment they express a decision — 'yes, we'd want "
+            "that', 'add that one', 'not the roll type'. This is what separates what you "
+            "merely discussed from what they are actually asking for, and it is what the "
+            "sales team acts on. Pass product names as you said them aloud, or their ids."),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "products": {"type": "array", "items": {"type": "string"},
+                             "description": "product names or ids the customer decided on"},
+                "interest": {"type": "string", "enum": ["wanted", "declined"],
+                             "description": "wanted if they want it, declined if they ruled it out"},
+            },
+            "required": ["products", "interest"],
+        },
+    },
+    {
         "name": "create_sales_enquiry",
         "description": (
             "Submit the qualified enquiry to the human sales team. You MUST first summarize the "
@@ -173,6 +236,27 @@ def dispatch_tool(name: str, args: dict):
         return ([{"type": "requirements", "requirements": dict(_requirements)}],
                 {"result": "ok", "captured": dict(_requirements)})
 
+    if name == "record_customer_interest":
+        interest = args.get("interest") or "wanted"
+        if interest not in ("wanted", "declined"):
+            interest = "wanted"
+        resolved, not_found = [], []
+        for token in args.get("products") or []:
+            found = _find(token)
+            (resolved if found else not_found).append(found or token)
+        if resolved:
+            # Put them on the panel if they aren't already, then mark them. A customer can
+            # ask for something by name before it was ever recommended or searched.
+            _remember([_slim(p) for p in resolved], "recommended")
+            ids = {p["id"] for p in resolved}
+            for entry in _shortlist:
+                if entry["id"] in ids:
+                    entry["interest"] = interest
+            _trim()
+        return ([{"type": "products", "items": list(_shortlist)}],
+                {"result": "ok", interest: [p["name"] for p in resolved],
+                 "not_found": not_found})
+
     if name == "create_sales_enquiry":
         if not args.get("confirmed"):
             return [], {"result": "not_confirmed",
@@ -185,9 +269,10 @@ def dispatch_tool(name: str, args: dict):
             "company": CONFIG.company_name,
             "summary": args.get("summary", ""),
             "requirements": dict(_requirements),
-            "products_discussed": [{"id": p["id"], "name": p["name"],
-                                    "category": p["category"], "source": p["source"]}
-                                   for p in _shortlist],
+            "products_wanted": [_brief(p) for p in _shortlist
+                                if p.get("interest") == "wanted"],
+            "products_discussed": [_brief(p) for p in _shortlist
+                                   if p.get("interest") != "wanted"],
             "status": "prepared_for_sales_team",
             "demo_only": True,
         }
