@@ -530,3 +530,33 @@ def test_every_profile_pins_its_transcription_languages():
         assert cfg.transcription_languages, profile
         for code in cfg.transcription_languages:
             assert "-" in code, f"{profile}: {code} is not a BCP-47 code"
+
+
+# --- spoken brevity, without turning the assistant terse ---
+
+def test_delivery_rules_are_in_the_instruction():
+    from backend.config import SYSTEM_INSTRUCTION
+
+    for rule in ["One or two short sentences",
+                 "Never re-read a list",
+                 "Do not repeat details back",
+                 "at most three products"]:
+        assert rule in SYSTEM_INSTRUCTION, rule
+
+
+def test_brevity_never_applies_to_the_confirmation_summary():
+    """"Detailed summary only when requested" would quietly kill the read-back before
+    submitting — which is acceptance criteria 8 to 10 and the mechanical guard's whole
+    point. The exception has to be explicit."""
+    from backend.config import SYSTEM_INSTRUCTION
+
+    assert "brevity never applies to it" in SYSTEM_INSTRUCTION
+    assert "confirming the" in SYSTEM_INSTRUCTION
+
+
+def test_brevity_is_bounded_so_the_assistant_does_not_go_terse():
+    """A model told only to be short becomes unhelpful. It needs explicit permission to
+    answer properly when the customer actually wants detail."""
+    from backend.config import SYSTEM_INSTRUCTION
+
+    assert "Being brief is not being unhelpful" in SYSTEM_INSTRUCTION
