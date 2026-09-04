@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arwG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="70" y="76" font-size="46" font-weight="700" fill="#0F172A">Barge-in: the browser stops first</text>
+
+  <g transform="translate(0,-40)">
+
+  <!-- ===== trigger ===== -->
+  <rect x="70" y="350" width="330" height="180" rx="16" fill="#FFFFFF" stroke="#0F172A" stroke-width="3"/>
+  <text x="235" y="428" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">YOU TALK</text>
+  <text x="235" y="474" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">OVER HER</text>
+
+  <!-- ===== path A · local ===== -->
+  <rect x="560" y="225" width="420" height="160" rx="16" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+  <text x="770" y="290" font-size="32" font-weight="700" fill="#047857" text-anchor="middle">BROWSER</text>
+  <text x="770" y="328" font-size="23" font-family="'SF Mono', Menlo, Consolas" fill="#047857" text-anchor="middle">mic RMS ≥ 0.02</text>
+  <text x="770" y="362" font-size="21" font-family="'SF Mono', Menlo, Consolas" fill="#10B981" text-anchor="middle">stopVoice()</text>
+
+  <!-- ===== path B · model ===== -->
+  <rect x="560" y="505" width="420" height="160" rx="16" fill="url(#llm)"/>
+  <text x="770" y="570" font-size="27" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" text-anchor="middle">✦ GEMINI LIVE</text>
+  <text x="770" y="612" font-size="21" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" fill-opacity="0.9" text-anchor="middle">server VAD → interrupted</text>
+
+  <!-- ===== outcome ===== -->
+  <rect x="1140" y="350" width="390" height="180" rx="16" fill="#ECFDF5" stroke="#10B981" stroke-width="3"/>
+  <text x="1335" y="432" font-size="42" font-weight="700" fill="#0F172A" text-anchor="middle">SHE STOPS</text>
+  <text x="1335" y="474" font-size="22" font-family="'SF Mono', Menlo, Consolas" fill="#047857" text-anchor="middle">playback cut</text>
+
+  <!-- ===== arrows ===== -->
+  <line x1="404" y1="400" x2="550" y2="312" stroke="#10B981" stroke-width="3.5" marker-end="url(#arwG)"/>
+  <line x1="984" y1="312" x2="1130" y2="398" stroke="#10B981" stroke-width="3.5" marker-end="url(#arwG)"/>
+  <text x="1062" y="318" font-size="28" font-weight="700" fill="#10B981" text-anchor="middle">~0 ms</text>
+
+  <line x1="404" y1="480" x2="550" y2="578" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <line x1="984" y1="578" x2="1130" y2="484" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <text x="1062" y="588" font-size="28" font-weight="700" fill="#64748B" text-anchor="middle">~200 ms</text>
+  </g>
+
+  <!-- ===== caveat ===== -->
+  <rect x="70" y="740" width="1460" height="98" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="104" y="782" font-size="25" font-weight="700" fill="#92400E">Cut playback locally the moment the mic hears you.</text>
+  <text x="104" y="816" font-size="22" fill="#B45309">Waiting for the server signal to cross the network is the difference between a conversation and a laggy toy.</text>
+</svg>

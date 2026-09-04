@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arwP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8B5CF6"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="70" y="76" font-size="46" font-weight="700" fill="#0F172A">Architecture diagram</text>
+
+  <g transform="translate(0,-35)">
+
+  <!-- ===== containers ===== -->
+  <rect x="70" y="175" width="390" height="545" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="100" y="218" font-size="21" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155">frontend/ · browser</text>
+
+  <rect x="630" y="175" width="330" height="545" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="660" y="218" font-size="20" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155">raw_server.py · :8000</text>
+
+  <rect x="1120" y="175" width="410" height="545" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="1150" y="218" font-size="21" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155">Google · Gemini Live API</text>
+
+  <!-- ===== browser ===== -->
+  <rect x="105" y="270" width="320" height="140" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="265" y="335" font-size="34" font-weight="700" fill="#0F172A" text-anchor="middle">MIC</text>
+  <text x="265" y="372" font-size="20" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">pcm-processor.js</text>
+
+  <rect x="105" y="520" width="320" height="140" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="265" y="585" font-size="34" font-weight="700" fill="#0F172A" text-anchor="middle">SPEAKER</text>
+  <text x="265" y="622" font-size="20" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">24 kHz playback</text>
+
+  <!-- ===== backend ===== -->
+  <rect x="660" y="270" width="270" height="140" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="795" y="333" font-size="26" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A" text-anchor="middle">upstream()</text>
+  <text x="795" y="371" font-size="18" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">send_realtime_input</text>
+
+  <rect x="660" y="520" width="270" height="140" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="795" y="583" font-size="26" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A" text-anchor="middle">downstream()</text>
+  <text x="795" y="621" font-size="18" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">session.receive()</text>
+
+  <!-- ===== model ===== -->
+  <rect x="1145" y="280" width="360" height="370" rx="16" fill="url(#llm)"/>
+  <text x="1325" y="430" font-size="28" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" text-anchor="middle">✦ GEMINI LIVE</text>
+  <text x="1325" y="474" font-size="17" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" fill-opacity="0.9" text-anchor="middle">gemini-3.1-flash-live-preview</text>
+  <text x="1325" y="508" font-size="19" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" fill-opacity="0.9" text-anchor="middle">native audio · VAD</text>
+
+  <!-- ===== up lane ===== -->
+  <line x1="429" y1="340" x2="650" y2="340" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <line x1="934" y1="340" x2="1137" y2="340" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <circle cx="545" cy="340" r="20" fill="#0F172A"/><text x="545" y="348" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="1040" cy="340" r="20" fill="#0F172A"/><text x="1040" y="348" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="545" y="300" font-size="24" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155" text-anchor="middle">16 kHz</text>
+
+  <!-- ===== down lane ===== -->
+  <line x1="1141" y1="590" x2="940" y2="590" stroke="#8B5CF6" stroke-width="3.5" marker-end="url(#arwP)"/>
+  <line x1="656" y1="590" x2="433" y2="590" stroke="#8B5CF6" stroke-width="3.5" marker-end="url(#arwP)"/>
+  <circle cx="1040" cy="590" r="20" fill="#0F172A"/><text x="1040" y="598" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="545" cy="590" r="20" fill="#0F172A"/><text x="545" y="598" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="1040" y="650" font-size="24" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#8B5CF6" text-anchor="middle">24 kHz</text>
+
+  <!-- ===== the boundary ===== -->
+  <text x="545" y="458" font-size="23" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155" text-anchor="middle">WebSocket</text>
+  <text x="545" y="489" font-size="21" font-family="'SF Mono', Menlo, Consolas" fill="#94A3B8" text-anchor="middle">/ws</text>
+  </g>
+
+  <!-- ===== caveat ===== -->
+  <rect x="70" y="770" width="1460" height="88" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="104" y="810" font-size="25" font-weight="700" fill="#92400E">Two tasks running at once — not one loop taking turns.</text>
+  <text x="104" y="842" font-size="22" fill="#B45309">Neither waits for the other. That is what lets her answer while you are still talking.</text>
+</svg>

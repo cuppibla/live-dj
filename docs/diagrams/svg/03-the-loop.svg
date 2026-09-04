@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arwP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8B5CF6"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="70" y="76" font-size="46" font-weight="700" fill="#0F172A">Open · Send · Receive · Play</text>
+
+  <g transform="translate(0,-45)">
+
+  <!-- ===== step circles ===== -->
+  <circle cx="220" cy="252" r="26" fill="#0F172A"/><text x="220" y="262" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <circle cx="607" cy="252" r="26" fill="#0F172A"/><text x="607" y="262" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <circle cx="993" cy="252" r="26" fill="#0F172A"/><text x="993" y="262" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <circle cx="1380" cy="252" r="26" fill="#0F172A"/><text x="1380" y="262" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+
+  <!-- ===== the four steps ===== -->
+  <rect x="70" y="300" width="300" height="190" rx="16" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="220" y="399" font-size="42" font-weight="700" fill="#0F172A" text-anchor="middle">OPEN</text>
+  <text x="220" y="443" font-size="21" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">live.connect()</text>
+
+  <rect x="457" y="300" width="300" height="190" rx="16" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="607" y="399" font-size="42" font-weight="700" fill="#0F172A" text-anchor="middle">SEND</text>
+  <text x="607" y="443" font-size="19" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">send_realtime_input</text>
+
+  <rect x="843" y="300" width="300" height="190" rx="16" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="993" y="399" font-size="42" font-weight="700" fill="#0F172A" text-anchor="middle">RECEIVE</text>
+  <text x="993" y="443" font-size="19" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">session.receive()</text>
+
+  <rect x="1230" y="300" width="300" height="190" rx="16" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="1380" y="399" font-size="42" font-weight="700" fill="#0F172A" text-anchor="middle">PLAY</text>
+  <text x="1380" y="443" font-size="19" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">24 kHz → speakers</text>
+
+  <!-- ===== forward arrows ===== -->
+  <line x1="374" y1="395" x2="447" y2="395" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <line x1="761" y1="395" x2="833" y2="395" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <line x1="1147" y1="395" x2="1220" y2="395" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+
+  <!-- ===== the loop back ===== -->
+  <path d="M 1380 494 L 1380 620 L 607 620 L 607 500" fill="none" stroke="#8B5CF6" stroke-width="3.5" marker-end="url(#arwP)"/>
+  <text x="993" y="668" font-size="30" font-weight="700" fill="#8B5CF6" text-anchor="middle">next turn</text>
+  </g>
+
+  <!-- ===== caveat ===== -->
+  <rect x="70" y="740" width="1460" height="98" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="104" y="782" font-size="25" font-weight="700" fill="#92400E">session.receive() ends after every single turn.</text>
+  <text x="104" y="816" font-size="22" fill="#B45309">Iterate it once and she answers one sentence, then goes silent forever. It needs an outer while True.</text>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arwP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8B5CF6"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="70" y="76" font-size="46" font-weight="700" fill="#0F172A">TTS reads. Gemini Live hears.</text>
+
+  <g transform="translate(0,-30)">
+
+  <!-- ===== panel A · TTS ===== -->
+  <rect x="70" y="165" width="1460" height="265" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="104" y="208" font-size="22" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155">TEXT-TO-SPEECH</text>
+
+  <rect x="180" y="242" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="330" y="316" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">TEXT</text>
+
+  <rect x="650" y="242" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="800" y="316" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">TTS</text>
+
+  <rect x="1120" y="242" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="1270" y="316" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">AUDIO</text>
+
+  <line x1="484" y1="302" x2="640" y2="302" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+  <line x1="954" y1="302" x2="1110" y2="302" stroke="#94A3B8" stroke-width="3" marker-end="url(#arw)"/>
+
+  <text x="180" y="404" font-size="25" fill="#94A3B8">It can speak. It cannot hear you.</text>
+
+  <!-- ===== panel B · LIVE ===== -->
+  <rect x="70" y="470" width="1460" height="330" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="104" y="513" font-size="22" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#334155">GEMINI LIVE</text>
+
+  <rect x="180" y="558" width="300" height="150" rx="14" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="330" y="647" font-size="38" font-weight="700" fill="#0F172A" text-anchor="middle">YOU</text>
+
+  <rect x="1120" y="558" width="300" height="150" rx="14" fill="url(#llm)"/>
+  <text x="1270" y="645" font-size="26" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF" text-anchor="middle">✦ GEMINI LIVE</text>
+
+  <line x1="484" y1="603" x2="1110" y2="603" stroke="#8B5CF6" stroke-width="3.5" marker-end="url(#arwP)"/>
+  <text x="797" y="586" font-size="28" font-weight="600" fill="#8B5CF6" text-anchor="middle">your voice</text>
+
+  <line x1="1116" y1="668" x2="490" y2="668" stroke="#8B5CF6" stroke-width="3.5" marker-end="url(#arwP)"/>
+  <text x="797" y="707" font-size="28" font-weight="600" fill="#8B5CF6" text-anchor="middle">her voice</text>
+
+  <text x="180" y="768" font-size="25" fill="#64748B">Audio in, audio out — both directions at the same time.</text>
+  </g>
+
+  <!-- ===== caveat ===== -->
+  <rect x="70" y="828" width="1460" height="46" rx="10" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="104" y="858" font-size="22" font-weight="700" fill="#92400E">Because the voice path stays audio, it hears tone, pauses and energy — not just your words.</text>
+</svg>
