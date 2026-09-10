@@ -22,7 +22,7 @@
   <text x="85" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">frontend/ · browser</text>
 
   <rect x="600" y="150" width="400" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
-  <text x="625" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">raw_server.py · FastAPI :8000</text>
+  <text x="625" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">genai_sdk/raw_server.py · FastAPI :8000</text>
 
   <rect x="1180" y="150" width="360" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
   <text x="1205" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">Google · Gemini Live API</text>

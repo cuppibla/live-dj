@@ -24,8 +24,8 @@ from fastapi.staticfiles import StaticFiles
 from google import genai
 from google.genai import types
 
-from backend.persona import MIRA_INSTRUCTION
-from backend.tools import TOOL_DECLARATIONS, dispatch_tool
+from genai_sdk.persona import MIRA_INSTRUCTION
+from genai_sdk.tools import TOOL_DECLARATIONS, dispatch_tool
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("live-dj")

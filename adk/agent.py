@@ -9,14 +9,14 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from google.adk.agents import Agent
 from google.adk.models import Gemini
 from google.genai import types
 
-from backend.persona import MIRA_INSTRUCTION
-from backend.adk.tools import play_playlist, play_track, skip, pause
+from adk.persona import MIRA_INSTRUCTION
+from adk.tools import play_playlist, play_track, skip, pause
 
 root_agent = Agent(
     # Gemini(...) instead of a bare model string so Mira's voice travels WITH the

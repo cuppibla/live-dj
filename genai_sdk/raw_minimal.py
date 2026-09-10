@@ -4,7 +4,7 @@ The whole thing, nothing else: open a session, send the mic up, get voice back,
 play it. No framework, no tools, no persona. Everything that makes Mira *Mira*
 lives in raw_server.py; this file is just the loop underneath her.
 
-    uv run uvicorn backend.raw_minimal:app --port 8000
+    uv run uvicorn genai_sdk.raw_minimal:app --port 8000
     # open http://localhost:8000 — headphones on — tap the mic and talk
 
 THE GOTCHA (the two lines a coding agent gets wrong):

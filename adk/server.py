@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,8 +30,8 @@ from google.adk.agents.run_config import StreamingMode
 from google.adk.agents import LiveRequestQueue
 from google.adk.sessions import InMemorySessionService
 
-from backend.adk.agent import root_agent
-from backend.adk.tools import to_play_command
+from adk.agent import root_agent
+from adk.tools import to_play_command
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("live-dj-adk")
@@ -57,8 +57,8 @@ RUN_CONFIG = RunConfig(
 
 app = FastAPI(title="live-dj-adk")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
-ASSETS = Path(__file__).resolve().parents[2] / "assets"
+FRONTEND = Path(__file__).resolve().parents[1] / "frontend"
+ASSETS = Path(__file__).resolve().parents[1] / "assets"
 
 
 @app.websocket("/ws")
