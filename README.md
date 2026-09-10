@@ -60,6 +60,18 @@ Same Mira, same browser, same four tracks — only the plumbing changed. Three f
 
 **Honest footnote:** ADK holds tool events while a transcription is still streaming (so transcript and action land in order). With a real microphone that's about a second — verified on `google-adk` 2.8.0 + `gemini-3.1-flash-live-preview`. In text-only tests it can look stuck. If you ever need the UI to react before the transcript settles, drive it from a `before_tool_callback` instead — that's EP3.
 
+### Run it in `adk web` (see the framework work)
+
+The same agent runs unchanged in ADK's dev UI — worth doing once, because every tool call shows up as an event card while Mira talks:
+
+```bash
+PYTHONPATH=. uv run adk web backend --port 8000     # open the UI, pick "adk", turn on the mic 🎙
+```
+
+- `PYTHONPATH=.` is needed because `adk web` imports the agent as `adk.agent`, and `agent.py` pulls `backend.persona` from the repo root.
+- Mira keeps her voice there: Aoede is attached to the agent itself via `Gemini(speech_config=...)` in [`agent.py`](backend/adk/agent.py), not to the custom server's `RunConfig` — so it travels wherever the agent runs.
+- **No music plays in adk web.** It has no `<audio>` player and no play-command bridge, so `play_playlist` fires (you'll see it in the events) and nothing happens. For the actual radio, use the custom UI above.
+
 ## Run it
 
 ```bash
