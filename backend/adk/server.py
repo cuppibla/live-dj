@@ -1,0 +1,140 @@
+"""live-dj on ADK — the Gemini Live backend, the framework way (EP2).
+
+The SAME radio as EP1 (live-dj), rebuilt with Google ADK instead of the raw
+google-genai SDK. What the framework does for you, vs EP1's `raw_server.py`:
+
+  - the two hand-rolled asyncio tasks  -> LiveRequestQueue (up) + runner.run_live() (down)
+  - the per-turn `while True: session.receive()` loop  -> GONE (run_live is continuous)
+  - tool declarations + manual send_tool_response       -> plain Python functions; ADK runs them
+
+A tool returns to the MODEL, not the browser — so the music "play" command is
+emitted *here*, in the run_live loop, when we see the function_call (the one
+real design call of the rewrite). Everything the browser sees is byte-for-byte
+the EP1 protocol, so the frontend is shared with EP1, byte for byte.
+"""
+import asyncio
+import json
+import logging
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from google.genai import types
+from google.adk.runners import Runner, RunConfig
+from google.adk.agents.run_config import StreamingMode
+from google.adk.agents import LiveRequestQueue
+from google.adk.sessions import InMemorySessionService
+
+from backend.adk.agent import root_agent
+from backend.adk.tools import to_play_command
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("live-dj-adk")
+
+VOICE = os.getenv("LIVE_VOICE", "Aoede")
+APP_NAME = "live-dj-adk"
+
+# ADK owns the session + the run loop (EP1 did both by hand).
+session_service = InMemorySessionService()
+runner = Runner(app_name=APP_NAME, agent=root_agent, session_service=session_service)
+
+RUN_CONFIG = RunConfig(
+    streaming_mode=StreamingMode.BIDI,                 # full-duplex live
+    response_modalities=["AUDIO"],
+    speech_config=types.SpeechConfig(                  # Mira's native voice (EP1 parity)
+        voice_config=types.VoiceConfig(
+            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=VOICE)
+        )
+    ),
+    input_audio_transcription=types.AudioTranscriptionConfig(),
+    output_audio_transcription=types.AudioTranscriptionConfig(),
+)
+
+app = FastAPI(title="live-dj-adk")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
+ASSETS = Path(__file__).resolve().parents[2] / "assets"
+
+
+@app.websocket("/ws")
+async def ws(websocket: WebSocket):
+    await websocket.accept()
+    log.info("ws connected; opening ADK live session (model=%s, voice=%s)", root_agent.model, VOICE)
+    session = await session_service.create_session(app_name=APP_NAME, user_id="listener")
+    live_request_queue = LiveRequestQueue()
+
+    async def upstream():
+        # browser mic (16k PCM) -> the queue. ADK feeds the queue to Gemini.
+        while True:
+            msg = await websocket.receive()
+            if msg.get("type") == "websocket.disconnect":
+                log.info("upstream: browser disconnected")
+                return
+            raw = msg.get("bytes")
+            if raw:
+                live_request_queue.send_realtime(
+                    types.Blob(data=raw, mime_type="audio/pcm;rate=16000")
+                )
+
+    async def handle(event):
+        # mirror EP1's handle(), but the source is an ADK run_live Event.
+        it = getattr(event, "input_transcription", None)
+        ot = getattr(event, "output_transcription", None)
+        if it and getattr(it, "text", None):
+            await websocket.send_text(json.dumps({"type": "transcript", "role": "user", "text": it.text}))
+        if ot and getattr(ot, "text", None):
+            await websocket.send_text(json.dumps({"type": "transcript", "role": "mira", "text": ot.text}))
+        content = getattr(event, "content", None)
+        if content and getattr(content, "parts", None):
+            for part in content.parts:
+                idata = getattr(part, "inline_data", None)
+                if idata and getattr(idata, "data", None):
+                    await websocket.send_bytes(idata.data)             # 24k voice
+                fc = getattr(part, "function_call", None)
+                if fc:                                                 # the tool -> browser bridge
+                    cmd = to_play_command(fc.name, dict(getattr(fc, "args", None) or {}))
+                    if cmd:
+                        await websocket.send_text(json.dumps({"type": "play", **cmd}))
+        if getattr(event, "interrupted", None):
+            await websocket.send_text(json.dumps({"type": "interrupted"}))   # barge-in
+
+    async def downstream():
+        # ONE continuous loop — no per-turn `while True`. ADK owns the turn-taking.
+        async for event in runner.run_live(
+            user_id=session.user_id, session_id=session.id,
+            live_request_queue=live_request_queue, run_config=RUN_CONFIG,
+        ):
+            await handle(event)
+
+    up = asyncio.create_task(upstream(), name="upstream")
+    down = asyncio.create_task(downstream(), name="downstream")
+    try:
+        done, pending = await asyncio.wait({up, down}, return_when=asyncio.FIRST_COMPLETED)
+        live_request_queue.close()   # let run_live wind down cleanly before we cancel anything
+        for t in done:
+            exc = t.exception()
+            if exc:
+                log.exception("%s task FAILED: %r", t.get_name(), exc, exc_info=exc)
+                try:
+                    await websocket.send_text(json.dumps({"type": "error", "message": f"{type(exc).__name__}: {exc}"}))
+                except Exception:
+                    pass
+        for t in pending:
+            t.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
+    except WebSocketDisconnect:
+        log.info("ws disconnected")
+    finally:
+        live_request_queue.close()
+        log.info("ws closed")
+
+
+if ASSETS.exists():
+    app.mount("/assets", StaticFiles(directory=str(ASSETS)), name="assets")
+if FRONTEND.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND), html=True), name="frontend")

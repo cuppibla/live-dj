@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/></marker>
+  </defs>
+  <rect width="1600" height="950" fill="#FFFFFF"/>
+  <text x="70" y="62" font-size="34" font-weight="700" fill="#0F172A">live-dj on ADK — the same sentence, the framework's way</text>
+  <text x="70" y="98" font-size="20" fill="#64748B">Same browser, same Mira. The two hand-rolled tasks became a queue and a loop the framework owns.</text>
+
+  <!-- containers (same shape as the raw diagram, on purpose) -->
+  <rect x="60" y="150" width="360" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="85" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">frontend/ · browser · unchanged</text>
+  <rect x="600" y="150" width="400" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="625" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">backend/adk/server.py · FastAPI :8000</text>
+  <rect x="1180" y="150" width="360" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="1205" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">Google · Gemini Live API</text>
+
+  <!-- browser (unchanged from EP1) -->
+  <rect x="85" y="250" width="310" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="281" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">pcm-processor.js</text>
+  <text x="105" y="305" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">AudioWorklet · → 16 kHz Int16</text>
+  <rect x="85" y="430" width="310" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="461" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">playVoice()</text>
+  <text x="105" y="485" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">24 kHz PCM · barge-in RMS ≥ 0.02</text>
+  <rect x="85" y="570" width="310" height="72" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="600" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">&lt;audio&gt; music</text>
+  <text x="105" y="624" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">ducks to 0.12 · 450 ms</text>
+
+  <!-- server: the ADK primitives -->
+  <rect x="625" y="250" width="350" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="645" y="281" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">LiveRequestQueue</text>
+  <text x="645" y="305" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">.send_realtime(Blob) · the up-belt</text>
+
+  <rect x="625" y="414" width="350" height="112" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="645" y="445" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">runner.run_live(...)</text>
+  <text x="645" y="469" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">ONE async for event — no per-turn loop</text>
+  <text x="645" y="491" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">voice · transcripts · interrupted</text>
+  <text x="645" y="513" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">Runner + InMemorySessionService</text>
+
+  <rect x="625" y="570" width="350" height="72" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="645" y="600" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">Agent(tools=[play_playlist, …])</text>
+  <text x="645" y="624" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">plain async funcs · ADK runs them</text>
+
+  <!-- the model -->
+  <rect x="1205" y="260" width="310" height="250" rx="14" fill="url(#llm)"/>
+  <text x="1235" y="330" font-size="22" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF">✦ Gemini Live</text>
+  <text x="1235" y="374" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">gemini-3.1-flash-live-preview</text>
+  <text x="1235" y="412" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">native audio · voice Aoede</text>
+  <text x="1235" y="440" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">VAD · transcriptions</text>
+  <text x="1235" y="468" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">function calling</text>
+
+  <!-- ① mic up -->
+  <line x1="395" y1="290" x2="618" y2="290" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="506" y="274" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">16 kHz PCM · /ws</text>
+  <circle cx="506" cy="290" r="15" fill="#0F172A"/><text x="506" y="295" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <!-- ② queue → model -->
+  <line x1="975" y1="290" x2="1198" y2="290" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="1086" y="274" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">ADK drains the queue</text>
+  <circle cx="1086" cy="290" r="15" fill="#0F172A"/><text x="1086" y="295" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <!-- ③ model → run_live -->
+  <line x1="1198" y1="470" x2="982" y2="470" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="1090" y="454" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">yields Events</text>
+  <circle cx="1090" cy="470" r="15" fill="#0F172A"/><text x="1090" y="475" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <!-- ④ voice to speakers -->
+  <line x1="618" y1="470" x2="402" y2="470" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="510" y="454" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">inline_data · 24 kHz</text>
+  <circle cx="510" cy="470" r="15" fill="#0F172A"/><text x="510" y="475" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+  <!-- ⑤ the one design call: tool result goes to the model, play command to the browser -->
+  <line x1="800" y1="526" x2="800" y2="563" stroke="#94A3B8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="818" y="550" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">function_call</text>
+  <circle cx="770" cy="545" r="15" fill="#0F172A"/><text x="770" y="550" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+  <path d="M 975 606 H 1300 V 517" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="1140" y="596" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">ADK returns the result</text>
+  <line x1="618" y1="606" x2="402" y2="606" stroke="#94A3B8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="510" y="590" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">{"type":"play"}</text>
+
+  <!-- legend -->
+  <rect x="70" y="736" width="22" height="16" rx="4" fill="url(#llm)"/><text x="102" y="749" font-size="14" fill="#64748B">the model</text>
+  <rect x="212" y="736" width="22" height="16" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/><text x="244" y="749" font-size="14" fill="#64748B">your code (framework primitives inside)</text>
+  <line x1="560" y1="744" x2="608" y2="744" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/><text x="618" y="749" font-size="14" fill="#64748B">stream / framework-owned</text>
+  <line x1="820" y1="744" x2="868" y2="744" stroke="#94A3B8" stroke-width="2"/><text x="878" y="749" font-size="14" fill="#64748B">call / command you write</text>
+
+  <!-- the one thing to remember: what got replaced -->
+  <rect x="60" y="790" width="1480" height="96" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="90" y="820" font-size="17" font-weight="700" fill="#92400E">What the framework replaced — and the one design call it leaves to you</text>
+  <text x="90" y="847" font-size="15" fill="#B45309">two asyncio tasks → LiveRequestQueue + run_live  ·  the per-turn receive() loop → one continuous async for  ·  JSON declarations + send_tool_response → plain Python functions</text>
+  <text x="90" y="872" font-size="15" fill="#B45309">A tool returns to the MODEL, not the browser — so the play command is emitted in the run_live loop, the moment the function_call streams by.</text>
+</svg>
