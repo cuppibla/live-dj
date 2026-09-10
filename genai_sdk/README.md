@@ -30,7 +30,7 @@ while True:
         ...
 ```
 
-That's the bug this folder exists to show you. A coding agent writes the first version by default. The second one is in [`raw_minimal.py`](raw_minimal.py#L49).
+That's the bug this folder exists to show you. A coding agent writes the first version by default. The second one is in [`raw_minimal.py`](raw_minimal.py#L42).
 
 Its sibling is [`gotcha_send_client_content.py`](gotcha_send_client_content.py): mic audio goes to `send_realtime_input`, **not** `send_client_content` — get that wrong and the model simply never hears you.
 
