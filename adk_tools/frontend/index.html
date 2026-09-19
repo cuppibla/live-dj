@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>live-dj · with mira</title>
+<style>
+  :root { --peach:#FFB89E; --lav:#A78BC9; --ink:#e8e0d4; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--ink);
+    font-family: ui-sans-serif, system-ui, Inter, sans-serif;
+    background:
+      radial-gradient(ellipse at 15% 5%, rgba(255,184,158,0.07) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 95%, rgba(167,139,201,0.07) 0%, transparent 45%),
+      #0f0b0a;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  }
+  .chrome { width: 100%; padding: 22px 28px; display: flex; justify-content: space-between;
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(232,224,212,0.25); }
+  .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; }
+  .orb { width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, rgba(255,245,235,0.95) 0%, var(--peach) 40%, var(--lav) 72%, transparent 100%);
+    filter: blur(2px); opacity: 0.6; transition: opacity .3s; }
+  .orb.idle      { animation: breathe 4.5s ease-in-out infinite; opacity: 0.55; }
+  .orb.listening { animation: pulse 1.6s ease-in-out infinite; opacity: 0.7; }
+  .orb.thinking  { animation: none; opacity: 0.45; }
+  .orb.speaking  { animation: speak 2.8s ease-in-out infinite; opacity: 0.9; }
+  @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  @keyframes pulse   { 0%,100%{transform:scale(1.0);opacity:.55} 50%{transform:scale(1.07);opacity:.8} }
+  @keyframes speak   { 0%,100%{transform:scale(1.02);filter:blur(2px) brightness(1)} 50%{transform:scale(1.12);filter:blur(2px) brightness(1.25)} }
+  .status { font-style: italic; font-size: 14px; color: rgba(232,224,212,0.6); min-height: 20px; }
+  .info { width: 100%; padding: 18px 28px 28px;
+    background: linear-gradient(to top, rgba(15,11,10,0.9), transparent); text-align: center; }
+  .now { font-size: 12px; letter-spacing: 0.06em; color: rgba(232,224,212,0.55); min-height: 16px; }
+  .transcript { max-width: 520px; margin: 10px auto 0; max-height: 96px; overflow-y: auto;
+    font-size: 12px; line-height: 1.7; color: rgba(232,224,212,0.5); text-align: left; }
+  .line.mira { color: var(--peach); }
+  button { margin-top: 14px; background: transparent; color: var(--ink); border: 1px solid rgba(232,224,212,0.35);
+    border-radius: 999px; padding: 10px 22px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; }
+  button:hover { border-color: var(--peach); }
+  button:disabled { opacity: 0.7; }
+  .hint { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(232,224,212,0.22); margin-top: 12px; }
+  .actions { position: fixed; right: 28px; top: 50%; transform: translateY(-50%);
+    width: 250px; max-height: 46vh; display: flex; flex-direction: column; gap: 8px; }
+  .actions-title { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(232,224,212,0.25); }
+  #actionlog { overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.5; }
+  .act { color: rgba(232,224,212,0.55); border-left: 2px solid rgba(232,224,212,0.18); padding-left: 8px; }
+  .act .verdict { color: rgba(232,224,212,0.35); }
+  .act.blocked { color: #e08d7a; border-left-color: #e08d7a; }
+  .act.blocked .verdict { color: #e08d7a; font-weight: 600; }
+  .timer { font-size: 11px; letter-spacing: 0.06em; color: var(--lav); min-height: 14px; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="chrome"><span>live-dj</span><span>with mira</span><span>bedroom pop</span></div>
+
+  <div class="stage">
+    <div id="orb" class="orb idle"></div>
+    <div id="status" class="status">tap the mic, then talk to mira</div>
+  </div>
+
+  <div class="actions">
+    <div class="actions-title">action log</div>
+    <div id="actionlog"></div>
+  </div>
+
+  <div class="info">
+    <div id="nowplaying" class="now"></div>
+    <div id="timer" class="timer"></div>
+    <div id="transcript" class="transcript"></div>
+    <button id="talk">🎙 talk</button>
+    <div class="hint">headphones on — or she hears her own radio</div>
+  </div>
+
+  <audio id="music" loop></audio>
+  <script src="/main.js"></script>
+</body>
+</html>
