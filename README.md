@@ -1,6 +1,6 @@
 # live-dj — a voice agent you can interrupt
 
-Talk to **Mira**, a late-night radio DJ. Ask her to play something. Talk over her mid-sentence and she stops, listens, and picks the thread back up.
+Talk to **syntax**, a late-night radio DJ. Ask her to play something. Talk over her mid-sentence and she stops, listens, and picks the thread back up.
 
 Built on the **Gemini Live API** — three times over, with the same browser and the same Mira: raw SDK, then ADK, then ADK with real abilities and a policy gate — so you can see exactly what each layer buys you.
 
