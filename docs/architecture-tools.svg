@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950" font-family="-apple-system, 'SF Pro Text', 'Helvetica Neue', Arial">
+  <defs>
+    <linearGradient id="llm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#8B5CF6"/></linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/></marker>
+    <marker id="arwP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8B5CF6"/></marker>
+    <marker id="arwG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/></marker>
+  </defs>
+  <rect width="1600" height="950" fill="#FFFFFF"/>
+  <text x="70" y="62" font-size="34" font-weight="700" fill="#0F172A">live-dj with abilities — every tool call passes one door</text>
+  <text x="70" y="98" font-size="20" fill="#64748B">The model decides; the gate rules; the browser only ever sees the verdict.</text>
+
+  <rect x="60" y="150" width="360" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="85" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">adk_tools/frontend/ · browser</text>
+  <rect x="600" y="150" width="400" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="625" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">adk_tools/server.py · FastAPI :8000</text>
+  <rect x="1180" y="150" width="360" height="550" rx="18" fill="#F8FAFC" fill-opacity="0.6" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="1205" y="182" font-size="14" font-family="'SF Mono', Menlo, Consolas" fill="#334155">Google · Gemini Live API</text>
+
+  <!-- browser -->
+  <rect x="85" y="250" width="310" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="281" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">🎙 mic → 16 kHz PCM</text>
+  <text x="105" y="305" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">"can you play something loud?"</text>
+  <rect x="85" y="430" width="310" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="461" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">action log panel</text>
+  <text x="105" y="485" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">✓ allowed · ⛔ blocked · reason</text>
+  <rect x="85" y="570" width="310" height="72" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="105" y="600" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">&lt;audio&gt; music + sleep timer</text>
+  <text x="105" y="624" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">only on an ok verdict</text>
+
+  <!-- server -->
+  <rect x="625" y="250" width="350" height="80" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="645" y="281" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">LiveRequestQueue → run_live</text>
+  <text x="645" y="305" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">voice up · voice + transcripts down</text>
+
+  <rect x="625" y="395" width="350" height="110" rx="10" fill="#FFFFFF" stroke="#10B981" stroke-width="2"/>
+  <text x="645" y="426" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#047857">quiet_hours_gate()</text>
+  <text x="645" y="450" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#047857">before_tool_callback · sees every call</text>
+  <text x="645" y="472" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#047857">return None → tool runs (observe)</text>
+  <text x="645" y="494" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#047857">return {...} → tool skipped (block)</text>
+
+  <rect x="625" y="570" width="350" height="72" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <text x="645" y="600" font-size="15" font-family="'SF Mono', Menlo, Consolas" fill="#0F172A">policy_feed()</text>
+  <text x="645" y="624" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B">verdict queue → log + play command</text>
+
+  <!-- model -->
+  <rect x="1205" y="260" width="310" height="250" rx="14" fill="url(#llm)"/>
+  <text x="1235" y="330" font-size="22" font-weight="600" font-family="'SF Mono', Menlo, Consolas" fill="#FFFFFF">✦ Gemini Live</text>
+  <text x="1235" y="374" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">gemini-3.1-flash-live-preview</text>
+  <text x="1235" y="412" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">decides: play_playlist(loud)</text>
+  <text x="1235" y="440" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">gets back: {"result":"blocked"}</text>
+  <text x="1235" y="468" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#E9E5FF">explains it, in character</text>
+
+  <!-- ① mic up -->
+  <line x1="395" y1="290" x2="618" y2="290" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="506" y="274" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">16 kHz PCM · /ws</text>
+  <circle cx="506" cy="290" r="15" fill="#0F172A"/><text x="506" y="295" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+  <!-- ② to model -->
+  <line x1="975" y1="290" x2="1198" y2="290" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="1086" y="274" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">audio + 5 tool schemas</text>
+  <circle cx="1086" cy="290" r="15" fill="#0F172A"/><text x="1086" y="295" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+  <!-- ③ function_call dispatched → the gate -->
+  <path d="M 1198 450 H 982" fill="none" stroke="#94A3B8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="1090" y="434" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">function_call</text>
+  <circle cx="1090" cy="450" r="15" fill="#0F172A"/><text x="1090" y="455" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+  <!-- ④ verdict back to the model (block) -->
+  <path d="M 975 490 H 1120 V 505 H 1198" fill="none" stroke="#10B981" stroke-width="2.5" marker-end="url(#arwG)"/>
+  <text x="1060" y="530" font-size="13" font-weight="700" font-family="'SF Mono', Menlo, Consolas" fill="#047857" text-anchor="middle">{"result":"blocked"}</text>
+  <circle cx="1120" cy="490" r="15" fill="#0F172A"/><text x="1120" y="495" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+  <!-- ⑤ verdict → queue → policy_feed -->
+  <line x1="800" y1="505" x2="800" y2="563" stroke="#8B5CF6" stroke-width="2.5" marker-end="url(#arwP)"/>
+  <text x="818" y="540" font-size="13" font-weight="700" font-family="'SF Mono', Menlo, Consolas" fill="#8B5CF6">verdict → queue</text>
+  <circle cx="770" cy="537" r="15" fill="#8B5CF6"/><text x="770" y="542" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+  <!-- ⑥ log + play command -->
+  <line x1="618" y1="470" x2="402" y2="470" stroke="#8B5CF6" stroke-width="2.5" marker-end="url(#arwP)"/>
+  <text x="510" y="454" font-size="13" font-weight="700" font-family="'SF Mono', Menlo, Consolas" fill="#8B5CF6" text-anchor="middle">{"type":"action"}</text>
+  <circle cx="510" cy="470" r="15" fill="#8B5CF6"/><text x="510" y="475" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">6</text>
+  <path d="M 618 606 H 402" fill="none" stroke="#94A3B8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="510" y="590" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">{"type":"play"} · ok</text>
+  <!-- ⑦ voice down -->
+  <line x1="1198" y1="320" x2="982" y2="320" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arw)"/>
+  <text x="1090" y="340" font-size="13" font-family="'SF Mono', Menlo, Consolas" fill="#64748B" text-anchor="middle">voice: "shh… quiet…"</text>
+
+  <!-- legend -->
+  <rect x="70" y="736" width="22" height="16" rx="4" fill="url(#llm)"/><text x="102" y="749" font-size="14" fill="#64748B">the model</text>
+  <rect x="212" y="736" width="22" height="16" rx="4" fill="#FFFFFF" stroke="#10B981" stroke-width="2"/><text x="244" y="749" font-size="14" fill="#64748B">deterministic policy (your code, no model)</text>
+  <rect x="560" y="736" width="22" height="16" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/><text x="592" y="749" font-size="14" fill="#64748B">plumbing</text>
+  <line x1="700" y1="744" x2="748" y2="744" stroke="#8B5CF6" stroke-width="2.5"/><text x="758" y="749" font-size="14" fill="#8B5CF6">the verdict drives the UI</text>
+  <line x1="980" y1="744" x2="1028" y2="744" stroke="#10B981" stroke-width="2.5"/><text x="1038" y="749" font-size="14" fill="#047857">the verdict drives the model</text>
+
+  <rect x="60" y="790" width="1480" height="96" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="2"/>
+  <text x="90" y="822" font-size="17" font-weight="700" fill="#92400E">Policy lives in code, not in the persona — and the UI listens to the gate, not to the event stream.</text>
+  <text x="90" y="849" font-size="15" fill="#B45309">One instruction line makes it deterministic: "always call the tool; policy decides." Otherwise Mira deflects "loud" in character and the gate never fires.</text>
+  <text x="90" y="873" font-size="15" fill="#B45309">ADK buffers tool events while a transcription streams; the callback fires the instant the tool is dispatched — so the log is instant and a blocked call can't start music.</text>
+</svg>

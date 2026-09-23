@@ -2,18 +2,19 @@
 
 Talk to **Mira**, a late-night radio DJ. Ask her to play something. Talk over her mid-sentence and she stops, listens, and picks the thread back up.
 
-Built on the **Gemini Live API** — twice, with the same browser and the same Mira, so you can see exactly what a framework buys you.
+Built on the **Gemini Live API** — three times over, with the same browser and the same Mira: raw SDK, then ADK, then ADK with real abilities and a policy gate — so you can see exactly what each layer buys you.
 
 ![live-dj](docs/screenshot.png)
 
-## Two builds, one app
+## Three builds, one app
 
 | Folder | Episode | What's inside |
 |---|---|---|
 | [`genai_sdk/`](genai_sdk/) | **EP1** — raw `google-genai` SDK | The whole primitive with no framework: a **39-line** `raw_minimal.py`, the full `raw_server.py`, and the gotcha that makes voice agents go silent after one sentence. |
 | [`adk/`](adk/) | **EP2** — Google ADK | The same DJ rebuilt on `LiveRequestQueue` + `run_live` + plain-function tools — plus how to run her inside **`adk web`** and watch the tool calls land as events. |
+| [`adk_tools/`](adk_tools/) | **EP3** — abilities | A new tool she can act on mid-sentence (`set_sleep_timer`), and **one policy door** every tool call passes through — a `before_tool_callback` that observes or **blocks**, with an action log that shows the verdict live. |
 
-`frontend/` and `assets/` sit at the root because both builds share them **byte for byte**. Everything that differs is inside those two folders — that's the point.
+`frontend/` and `assets/` sit at the root because EP1 and EP2 share them **byte for byte** — that's the point. EP3 ships its own copy of the frontend (it grows an action-log panel).
 
 ## Quick start
 
@@ -23,7 +24,8 @@ cp .env.example .env          # paste your GOOGLE_API_KEY (Gemini Developer API 
 
 uv run uvicorn genai_sdk.raw_server:app --port 8000     # EP1 · the DJ on the raw SDK
 uv run uvicorn adk.server:app --port 8000               # EP2 · the same DJ on ADK
-uv run adk web . --port 8000                            # EP2 · the same agent inside ADK's dev UI
+uv run uvicorn adk_tools.server:app --port 8000         # EP3 · abilities + the policy gate (QUIET_HOURS=1 for the blocked take)
+uv run adk web . --port 8000                            # EP2/EP3 · the same agents inside ADK's dev UI
 ```
 
 Open <http://localhost:8000>, **put headphones on** (otherwise she hears her own radio), tap 🎙 and talk.
@@ -36,7 +38,7 @@ Try: *"hey Mira"* · *"can you play something dream pop"* · *"skip this"* · *"
 |---|---|
 | `frontend/` | minimal browser client: 16 kHz mic worklet, 24 kHz playback, client-side barge-in, music ducking |
 | `assets/tracks/` · `assets/mira_persona.txt` | four dream-pop tracks and who Mira is |
-| `docs/` | architecture diagrams for both builds, the product / UX / engineering design docs, the de-risk test |
+| `docs/` | architecture diagrams for all three builds, the product / UX / engineering design docs, the de-risk test |
 
 ## Notes
 
